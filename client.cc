@@ -1,3 +1,7 @@
+/*
+ * Function that sends an array of size n over the network
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -6,6 +10,14 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h> 
+
+
+//blocks to be transferred
+struct __attribute__((__packed__)) block {
+        short block_num;
+        char *hash;
+        char *data;
+}; 
 
 void error(const char *msg)
 {

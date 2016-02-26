@@ -5,6 +5,11 @@
 /* Initially written for exactly one user
  *
  * Rabin Fingerprinting has some issues with multiple users.
+ *
+ *
+ *
+ *
+ *
  * */
 
 
@@ -64,13 +69,17 @@ RabinServer::~RabinServer () {
 
     close(newsockfd);
     close(sockfd);
+
+    /* Need to destroy blocks here*/
+
 }
 
 
 
 int RabinServer::add_blocks(char *file) {
 
-     
+    /* Break file into blocks, then for each of these
+     * blocks call insert_block */
 
     /* Returning one indicates success */
     return 1;
@@ -93,11 +102,17 @@ int RabinServer::write_to_client(int i) {
 } 
 
 
+/* For now a simple djb2 hash, we should replace this 
+ * when we can */
+unsigned int RabinServer::hash_function (char *b) {
 
-int RabinServer::hash_function (char *b) {
+    unsigned int hash = 5381;
+    int c;
 
-    (void) b;
-    return 1;
+    while ((c = (*b++)))
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c*/
+    
+    return hash;
 
 }
 

@@ -58,7 +58,7 @@ class RabinServer
    
     /* Rabin hash function here char -> int */
  
-    int hash_function(char *b);
+    unsigned int hash_function(char *b);
     void insert_block (char *b);
     void error(const char* msg);
     /* Private class variables go here */  

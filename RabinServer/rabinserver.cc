@@ -52,7 +52,7 @@ RabinServer::RabinServer(int port_) {
         error("Error on accept");
 
 
-    /* READING FROM SERVER */
+    /* How to read from the client
 
     bzero(buffer, 256);
     n = read(newsockfd, buffer, 255);
@@ -60,7 +60,7 @@ RabinServer::RabinServer(int port_) {
     if (n < 0) 
        error("Error reading from socket");
     printf("message: %s\n", buffer);
-    /***********************/
+    */
 
 }
 
@@ -70,7 +70,6 @@ RabinServer::~RabinServer () {
     close(sockfd);
 
     /* Need to destroy blocks here*/
-
 }
 
 
@@ -81,9 +80,7 @@ int RabinServer::add_blocks(char *file, size_t s) {
      * blocks call insert_block */
 
     assert (file != NULL);
-
     unsigned i;
-
     char *prev = file;
 
     for(i = 1; i < s; i++) {
@@ -97,9 +94,7 @@ int RabinServer::add_blocks(char *file, size_t s) {
             
             prev = file + i;
         } 
-
     } 
-
 
     /* Returning one indicates success */
     return 1;
@@ -110,7 +105,6 @@ int RabinServer::rabin_func(char byte, int i) {
 
     /* will implement a Rabin function here 
      * Till then, this creates 2KB blocks */
-
     (void) byte;
 
     return (i % 2048);
@@ -124,7 +118,6 @@ int RabinServer::write_to_client(int i) {
     block *block_i = blocks.at(i);
     
     block_desc descriptor;
-
     descriptor.block_num = block_i -> block_num;
     descriptor.data_size = block_i -> data_size;
 
@@ -133,12 +126,10 @@ int RabinServer::write_to_client(int i) {
     n = write(newsockfd, &descriptor, sizeof(block_desc));
 
     if( n < 0) {
-
         cerr << "Error writing to client" << endl;
     } else {
 
         n = write(newsockfd, data , block_i -> data_size);
-
     }
 
     return n;

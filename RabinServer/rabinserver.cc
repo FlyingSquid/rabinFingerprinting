@@ -27,8 +27,8 @@ RabinServer::RabinServer(int port_) {
     /* These might have to be moved to class members */
 
     socklen_t clilen;
-    char buffer[256];
-    int n;
+    //char buffer[256];
+    //int n;
     /*************************************************/
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);

@@ -2,14 +2,25 @@
 
 int main (int argc, char* argv[]) {
 
+    if(argc < 2) {
+        cout << "Too few arguments" <<endl;
+        exit(0);
+    }
+
     RabinServer *r = new RabinServer(0);
 
-    FILE *t = fopen("testfile", "r");
-    char c[2048];
+    FILE *t = fopen(argv[1], "r");
 
-    fread(c, 2048, 1, t);
+    fseek(t, 0L, SEEK_END);
+    int n = ftell(t);
+    fseek(t, 0L, SEEK_SET);
 
-    int a = r->add_blocks((char *)c, 2048);
+
+    char c[n];
+
+    fread(c, n, 1, t);
+
+    int a = r->add_blocks((char *)c, n);
     cout << a <<endl;
 
     delete (r);

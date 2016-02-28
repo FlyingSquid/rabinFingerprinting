@@ -14,7 +14,6 @@ RabinServer::RabinServer(int port_) {
 
     portno = port_;
 
-
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
@@ -26,13 +25,12 @@ RabinServer::RabinServer(int port_) {
             error("ERROR on binding");
     }
 
-
+    max_size = (blocks.max_size()) / 10000;
 }
 
 int RabinServer::connect_to_client() {
 
     /*Accept condition */
-
     listen(sockfd, 5);
     clilen = sizeof(cli_addr);
     newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr,
@@ -84,6 +82,8 @@ int RabinServer::add_blocks(char *file, size_t s) {
     char *prev = file;
     int num_blocks = 0;
 
+    cout << "Size of file is ";
+    cout << s << endl;
 
     for(i = 1; i < s; i++) {
         
@@ -100,6 +100,8 @@ int RabinServer::add_blocks(char *file, size_t s) {
 
     if(prev != file + s) {
         size_t width = file + s - prev; 
+        cout << "Extra with width ";
+        cout << width <<endl;
         insert_block(prev, width);
         num_blocks++;
     }
@@ -114,7 +116,7 @@ int RabinServer::rabin_func(char byte, int i) {
      * Till then, this creates 2KB blocks */
     (void) byte;
     /* We index from 0*/
-    return (i % 2047);
+    return (i % 2048);
 
 }
 
@@ -143,31 +145,62 @@ int RabinServer::write_to_client(int i) {
 } 
 
 
+char *RabinServer::get_block (int b) {
+
+    block *block_i = blocks.at(b);
+    char *to_return = new char[block_i -> data_size];
+    memcpy(to_return, block_i -> data, block_i -> data_size);
+    return to_return;
+}
+
+
+
 /* For now a simple djb2 hash, we should replace this 
  * when we can */
-unsigned int RabinServer::hash_function (char *b) {
+unsigned int RabinServer::hash_function (char *b, int size) {
+
+
+    cout << "Inserting block of width ";
+    cout << size <<endl;
+
+
+    char *str = new char[size+1];
+    memcpy(str, b, size);
+    str[size] = 0;
 
     unsigned int hash = 5381;
     int c;
 
-    while ((c = (*b++)))
+    while ((c = (*str))) {
+        str++;
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c*/
+
+    }
+    //delete[] str; // This needs to be worked on
     
-    return hash;
+    return (hash % max_size);
 
 }
 
-void RabinServer::insert_block(char *b, int size) {
+/* Returns the block number */
+unsigned RabinServer::insert_block(char *b, int size) {
 
     block *new_block = new block;
-    int n = hash_function(b);
+    unsigned n = hash_function(b, size);
+
+    cout << "Hash was ";
+    cout << n << endl;
 
     new_block -> block_num = n;
     new_block -> data_size = size;
     memcpy(new_block -> data, b, size);
+   
+    if(blocks.size() <= n) {
+       blocks.resize(2*n); 
+    }
     
     blocks.at(n) = new_block;
-
+    return n;
 }
 
 

@@ -18,14 +18,14 @@ using namespace std;
 
 typedef struct __attribute__((__packed__)) block_desc {
 
-    int block_num;
+    unsigned block_num;
     size_t data_size;
 
 } block_desc;
 
 typedef struct __attribute__((__packed__)) block {
 
-    int block_num;
+    unsigned block_num;
     char data[2048];
     size_t data_size;
 } block;
@@ -51,12 +51,15 @@ class RabinServer
         int connect_to_client();
 
 
+        /* Inserts a block into the local cache */
+        unsigned insert_block (char *b, int size);
+        
+        char *get_block(int b);
+
     private:
         
         /* Hash function to insert blocks to <blocks> */ 
-        unsigned int hash_function(char *b);
-        /* Inserts a block into the local cache */
-        void insert_block (char *b, int size);
+        unsigned int hash_function(char *b, int size);
         /* Rabin function */
         int rabin_func (char byte, int i);
        
@@ -68,6 +71,8 @@ class RabinServer
         int portno, sockfd, newsockfd;
         sockaddr_in serv_addr, cli_addr;
         socklen_t clilen;
+
+        unsigned max_size;
         /***********************************/
 };
 

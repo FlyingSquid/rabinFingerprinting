@@ -2,16 +2,6 @@
 #include <assert.h>
 
 
-/* Initially written for exactly one user
- *
- * Rabin Fingerprinting has some issues with multiple users.
- *
- *
- *
- *
- *
- * */
-
 
 void RabinServer::error(const char* msg)
 {
@@ -24,12 +14,6 @@ RabinServer::RabinServer(int port_) {
 
     portno = port_;
 
-    /* These might have to be moved to class members */
-
-    socklen_t clilen;
-    //char buffer[256];
-    //int n;
-    /*************************************************/
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     serv_addr.sin_family = AF_INET;
@@ -42,9 +26,15 @@ RabinServer::RabinServer(int port_) {
             error("ERROR on binding");
     }
 
+
+}
+
+int RabinServer::connect_to_client() {
+
+    /*Accept condition */
+
     listen(sockfd, 5);
     clilen = sizeof(cli_addr);
-
     newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr,
                                     &clilen);
 
@@ -52,15 +42,21 @@ RabinServer::RabinServer(int port_) {
         error("Error on accept");
 
 
-    /* How to read from the client
+    /* How to read from the client******
 
+    char buffer[256];
+    int n;
     bzero(buffer, 256);
+
     n = read(newsockfd, buffer, 255);
     
     if (n < 0) 
        error("Error reading from socket");
+
     printf("message: %s\n", buffer);
-    */
+
+    ************************************/
+    return newsockfd;
 
 }
 
@@ -69,11 +65,15 @@ RabinServer::~RabinServer () {
     close(newsockfd);
     close(sockfd);
 
-    /* Need to destroy blocks here*/
+    /* Need to destroy blocks here
+     * 
+     * Iterate through the vector block, free each element.
+     *
+     *    */
 }
 
 
-
+// Returns the number of blocks allocated
 int RabinServer::add_blocks(char *file, size_t s) {
 
     /* Break file into blocks, then for each of these
@@ -82,6 +82,7 @@ int RabinServer::add_blocks(char *file, size_t s) {
     assert (file != NULL);
     unsigned i;
     char *prev = file;
+    int num_blocks = 0;
 
     for(i = 1; i < s; i++) {
         
@@ -91,13 +92,12 @@ int RabinServer::add_blocks(char *file, size_t s) {
              * size of the block */
             size_t width = (file + i - prev);
             insert_block(prev, width);
-            
+            num_blocks++; 
             prev = file + i;
         } 
     } 
 
-    /* Returning one indicates success */
-    return 1;
+    return num_blocks;
 }
 
 

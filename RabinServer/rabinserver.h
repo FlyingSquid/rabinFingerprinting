@@ -45,6 +45,11 @@ class RabinServer
         /* Writes a given block to the user */
         int write_to_client(int i);
 
+        /* Listens for the client and accepts a connection 
+        * Must be called before write_to_client is
+        * called  */
+        int connect_to_client();
+
 
     private:
         
@@ -62,6 +67,7 @@ class RabinServer
         std::vector<block *> blocks;
         int portno, sockfd, newsockfd;
         sockaddr_in serv_addr, cli_addr;
+        socklen_t clilen;
         /***********************************/
 };
 

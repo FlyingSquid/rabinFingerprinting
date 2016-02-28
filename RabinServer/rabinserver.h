@@ -54,7 +54,7 @@ class RabinServer
         /* Inserts a block into the local cache */
         unsigned insert_block (char *b, int size);
         
-        char *get_block(int b);
+        char *get_block(unsigned b);
 
     private:
         

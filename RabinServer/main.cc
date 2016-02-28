@@ -23,6 +23,16 @@ int main (int argc, char* argv[]) {
     int a = r->add_blocks((char *)c, n);
     cout << a <<endl;
 
+    string test = "ThisIsATestString";
+
+    char *ctest = (char *)test.c_str();
+
+    unsigned len = test.length();
+
+    unsigned n1 = r->insert_block(ctest, len);
+
+    char *x = r->get_block(n1);
+    cout << x <<endl;
     delete (r);
     return 1;
 

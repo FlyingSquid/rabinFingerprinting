@@ -145,7 +145,7 @@ int RabinServer::write_to_client(int i) {
 } 
 
 
-char *RabinServer::get_block (int b) {
+char *RabinServer::get_block (unsigned b) {
 
     block *block_i = blocks.at(b);
     char *to_return = new char[block_i -> data_size];
@@ -176,8 +176,8 @@ unsigned int RabinServer::hash_function (char *b, int size) {
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c*/
 
     }
-    //delete[] str; // This needs to be worked on
-    
+  //  delete str;
+   
     return (hash % max_size);
 
 }
@@ -196,7 +196,7 @@ unsigned RabinServer::insert_block(char *b, int size) {
     memcpy(new_block -> data, b, size);
    
     if(blocks.size() <= n) {
-       blocks.resize(2*n); 
+       blocks.resize(2*n);
     }
     
     blocks.at(n) = new_block;

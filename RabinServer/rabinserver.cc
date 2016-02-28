@@ -84,6 +84,7 @@ int RabinServer::add_blocks(char *file, size_t s) {
     char *prev = file;
     int num_blocks = 0;
 
+
     for(i = 1; i < s; i++) {
         
         char c = file[i];
@@ -97,6 +98,12 @@ int RabinServer::add_blocks(char *file, size_t s) {
         } 
     } 
 
+    if(prev != file + s) {
+        size_t width = file + s - prev; 
+        insert_block(prev, width);
+        num_blocks++;
+    }
+
     return num_blocks;
 }
 
@@ -106,8 +113,8 @@ int RabinServer::rabin_func(char byte, int i) {
     /* will implement a Rabin function here 
      * Till then, this creates 2KB blocks */
     (void) byte;
-
-    return (i % 2048);
+    /* We index from 0*/
+    return (i % 2047);
 
 }
 

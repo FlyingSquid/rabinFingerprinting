@@ -111,26 +111,21 @@ int RabinServer::add_blocks(char *file, size_t s) {
 }
 
 
-/* Definite problem here, I can't many-one map\
- * {0..255} -> {0...2047}
- *
- * I think the wbvc paper actually maps B x B x B -> {0...2047}
- * I think the paper instantiates n to 3.
- * 
- *
- */
-int RabinServer::rabin_func(char b0, char b1, char b2, int i) {
+unsigned RabinServer::rabin_func(char b0, char b1, char b2, int i) {
 
     /* will implement a uniform random function here 
      * Till then, this creates 2KB blocks */
 
-    /* Should use std::uniform_int_distribution here 
- *  but need to seed with byte somehow*/
-
-    (void) b0;
+    char hash_me[3];
+    hash_me[0] = b0;
+    hash_me[1] = b1;
+    hash_me[2] = b2;
+   /* (void) b0;
     (void) b1;
     (void) b2;
-    return (i % 2048);
+    return (i % 2048);*/
+
+    return hash_function(hash_me, 3) % 2048;
 
 }
 
@@ -174,8 +169,8 @@ char *RabinServer::get_block (unsigned b) {
 unsigned int RabinServer::hash_function (char *b, int size) {
 
 
-    cout << "Inserting block of width ";
-    cout << size <<endl;
+    //cout << "Inserting block of width ";
+    //cout << size <<endl;
 
 
     char *str = new char[size+1];

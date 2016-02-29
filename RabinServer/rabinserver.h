@@ -61,7 +61,7 @@ class RabinServer
         /* Hash function to insert blocks to <blocks> */ 
         unsigned int hash_function(char *b, int size);
         /* Rabin function */
-        int rabin_func (char byte, int i);
+        int rabin_func (char b0, char b1, char b2, int i);
        
         void error(const char* msg);
         /* Private class variables go here */  

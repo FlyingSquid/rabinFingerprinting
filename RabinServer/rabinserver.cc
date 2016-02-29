@@ -1,5 +1,6 @@
 #include "rabinserver.h"
 #include <assert.h>
+//#include <random>
 
 
 
@@ -77,6 +78,7 @@ int RabinServer::add_blocks(char *file, size_t s) {
     /* Break file into blocks, then for each of these
      * blocks call insert_block */
 
+
     assert (file != NULL);
     unsigned i;
     char *prev = file;
@@ -85,10 +87,9 @@ int RabinServer::add_blocks(char *file, size_t s) {
     cout << "Size of file is ";
     cout << s << endl;
 
-    for(i = 1; i < s; i++) {
+    for(i = 2; i < s; i++) {
         
-        char c = file[i];
-        if(rabin_func(c,i) == 0) {
+        if(rabin_func(file[i-2], file[i-1],file[i],i) == 0) {
             /* This is some pointer addition that gives the
              * size of the block */
             size_t width = (file + i - prev);
@@ -110,12 +111,25 @@ int RabinServer::add_blocks(char *file, size_t s) {
 }
 
 
-int RabinServer::rabin_func(char byte, int i) {
+/* Definite problem here, I can't many-one map\
+ * {0..255} -> {0...2047}
+ *
+ * I think the wbvc paper actually maps B x B x B -> {0...2047}
+ * I think the paper instantiates n to 3.
+ * 
+ *
+ */
+int RabinServer::rabin_func(char b0, char b1, char b2, int i) {
 
-    /* will implement a Rabin function here 
+    /* will implement a uniform random function here 
      * Till then, this creates 2KB blocks */
-    (void) byte;
-    /* We index from 0*/
+
+    /* Should use std::uniform_int_distribution here 
+ *  but need to seed with byte somehow*/
+
+    (void) b0;
+    (void) b1;
+    (void) b2;
     return (i % 2048);
 
 }

@@ -1,6 +1,19 @@
 #include "rabinserver.h"
 #include <assert.h>
-//#include <random>
+
+
+/*
+ * TODO:
+ *  - Implement an actual Rabin Function to split blocks, current ne
+ *    is tooo damn slow.
+ *
+ *  - Map file names to blocks somehow
+ *
+ *
+ *
+ *
+ *
+ */
 
 
 

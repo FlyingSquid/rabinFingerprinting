@@ -16,18 +16,22 @@
 
 using namespace std;
 
+
 typedef struct __attribute__((__packed__)) block_desc {
 
     unsigned block_num;
     size_t data_size;
+    bool old;
 
 } block_desc;
 
 typedef struct __attribute__((__packed__)) block {
 
     unsigned block_num;
-    char data[2048];
     size_t data_size;
+    bool old;
+    char *data;
+    
 } block;
 
 

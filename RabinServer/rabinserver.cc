@@ -97,8 +97,7 @@ int RabinServer::add_blocks(char *file, size_t s) {
     char *prev = file;
     int num_blocks = 0;
 
-    cout << "Size of file is ";
-    cout << s << endl;
+    cout << "Size of file is " << s << endl;
 
     for(i = 2; i < s; i++) {
         
@@ -133,13 +132,14 @@ unsigned RabinServer::rabin_func(char b0, char b1, char b2, int i) {
     hash_me[0] = b0;
     hash_me[1] = b1;
     hash_me[2] = b2;
-   /* (void) b0;
-    (void) b1;
-    (void) b2;
-    return (i % 2048);*/
 
-    return hash_function(hash_me, 3) % 2048;
+    unsigned hashval = (hash_function(hash_me, 3) % 2048);
 
+    if(hashval == 0) {
+
+        cout<<i<<endl;
+    }
+    return hashval;
 }
 
 int RabinServer::write_to_client(int i) {
@@ -151,18 +151,20 @@ int RabinServer::write_to_client(int i) {
     block_desc descriptor;
     descriptor.block_num = block_i -> block_num;
     descriptor.data_size = block_i -> data_size;
-
-    char *data = (char *) block_i -> data;
+    descriptor.old = block_i -> old;
 
     n = write(newsockfd, &descriptor, sizeof(block_desc));
 
-    if( n < 0) {
-        cerr << "Error writing to client" << endl;
-    } else {
+    if(!block_i -> old) {
 
-        n = write(newsockfd, data , block_i -> data_size);
+        char *data = (char *) block_i -> data;
+
+        if( n < 0) {
+            cerr << "Error writing to client" << endl;
+        } else {
+            n = write(newsockfd, data , block_i -> data_size);
+        }
     }
-
     return n;
 } 
 
@@ -210,18 +212,22 @@ unsigned RabinServer::insert_block(char *b, int size) {
     block *new_block = new block;
     unsigned n = hash_function(b, size);
 
-    cout << "Hash was ";
-    cout << n << endl;
 
     new_block -> block_num = n;
     new_block -> data_size = size;
+    new_block -> old = false;
+    new_block->data = new char[size];
     memcpy(new_block -> data, b, size);
    
     if(blocks.size() <= n) {
        blocks.resize(2*n);
     }
-    
-    blocks.at(n) = new_block;
+   
+    if(blocks.at(n) == NULL) {
+        blocks.at(n) = new_block;
+    } else {
+        blocks.at(n)-> old = true;
+    }
     return n;
 }
 

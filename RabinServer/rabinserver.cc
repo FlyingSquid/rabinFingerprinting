@@ -118,21 +118,15 @@ int RabinServer::send_file(char *file, size_t s) {
         size_t width = file + s - prev; 
         cout << "Extra with width ";
         cout << width <<endl;
-        insert_block(prev, width);
+        block_num = insert_block(prev, width);
+        write_block_to_client(block_num); 
         num_blocks++;
     }
 
+    /* TODO: Probably need a sentinel to denot EOF here */
+
     return num_blocks;
 }
-
-
-
-
-
-
-
-
-
 
 
 

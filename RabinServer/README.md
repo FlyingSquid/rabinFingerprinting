@@ -11,7 +11,9 @@ It utilizes rabin fingerprinting and TCP.
 - A stream of bytes of the provided size is then given
 
 
+## TODO
 
-
+- Need to change block's implementation from `vector` to `map` or some other
+structure that can deal with sparse hashes. Basically I've implemented a really dumb hash table, time to use a real one. The keys should just be block numbers. This is a simplification of the WBVC paper.
 
 

@@ -37,7 +37,7 @@ class RabinClient
     public:
         /* Server name and port number*/
         RabinClient(char * hostname, int port_);
-        ~RabinServer();
+        ~RabinClient();
 
         /* Requests a file from the server
          *

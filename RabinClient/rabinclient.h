@@ -39,25 +39,23 @@ class RabinClient
         RabinClient(char * hostname, int port_);
         ~RabinClient();
 
-        /* Requests a file from the server
+        /* Receives a file (as blocks) from the server
          *
-         * When it receives blocks back from the server,
-         * it stores the blocks where they need to be stored.
+         * Does this by calling request_block
          *
-         * Then recombines and returns a file
-         *
-         *
-         * Requests to server are made in terms of blocks only
-         *
-         * Server caches only on content here, probably need to cache
-         * on file name toooo
+         * Returns a pointer to null if nothing is received
          *
          * */
-        char *request_file(char *file_name, size_t s); 
+        char *receive_file(); 
 
-        /* Requests a block from the block cache */
-        int request_block(int i);
-
+        /* Requests a block from the server.
+         * If an 'old' block_desc is required, it just fishes the block from the local cache.
+         *
+         * Else, it adds the received block to the local cache and returns it.
+         *
+         */
+        char *request_block(int i);
+    
         /* Establishes a connection to the server */
         int connect_to_server();
 

@@ -43,11 +43,17 @@ class RabinServer
         RabinServer(int port_);
         ~RabinServer();
 
-        /* Adds a fles blocks to the hash table */
+        /* Sends a file, block by block to the client*/
+        int send_file(char *file, size_t s); 
+
+
+        /* Exists only for non-network testing. Adds file blocks
+         * to the hash table */  
         int add_blocks(char *file, size_t s); 
 
+
         /* Writes a given block to the user */
-        int write_to_client(int i);
+        int write_block_to_client(unsigned i);
 
         /* Listens for the client and accepts a connection 
         * Must be called before write_to_client is

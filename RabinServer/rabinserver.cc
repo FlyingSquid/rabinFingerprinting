@@ -40,6 +40,9 @@ RabinServer::RabinServer(int port_) {
     }
 
     max_size = (blocks.max_size()) / 10000;
+
+
+
 }
 
 int RabinServer::connect_to_client() {
@@ -85,7 +88,56 @@ RabinServer::~RabinServer () {
 }
 
 
-// Returns the number of blocks allocated
+
+/* Returns the number of files sent */
+int RabinServer::send_file(char *file, size_t s) {
+
+    assert (file != NULL);
+    unsigned i;
+    char *prev = file;
+    int num_blocks = 0;
+    unsigned block_num;
+
+    cout << "Size of file is " << s << endl;
+
+    for(i = 2; i < s; i++) {
+        
+        if(rabin_func(file[i-2], file[i-1],file[i],i) == 0) {
+            /* This is some pointer addition that gives the
+             * size of the block */
+            size_t width = (file + i - prev);
+           
+            block_num = insert_block(prev, width);
+            write_block_to_client(block_num); 
+            prev = file + i;
+            num_blocks++; 
+        } 
+    } 
+
+    if(prev != file + s) {
+        size_t width = file + s - prev; 
+        cout << "Extra with width ";
+        cout << width <<endl;
+        insert_block(prev, width);
+        num_blocks++;
+    }
+
+    return num_blocks;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Returns the number of blocks sent
 int RabinServer::add_blocks(char *file, size_t s) {
 
     /* Break file into blocks, then for each of these
@@ -142,7 +194,7 @@ unsigned RabinServer::rabin_func(char b0, char b1, char b2, int i) {
     return hashval;
 }
 
-int RabinServer::write_to_client(int i) {
+int RabinServer::write_block_to_client(unsigned i) {
 
     int n;
 

@@ -78,6 +78,9 @@ class RabinServer
 
         /* Simulates a local cache (in memory) */
         std::vector<block *> blocks;
+
+        //std::unordered_map<unsigned, block *> blocks_final; 
+
         int portno, sockfd, newsockfd;
         sockaddr_in serv_addr, cli_addr;
         socklen_t clilen;

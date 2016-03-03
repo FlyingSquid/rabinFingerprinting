@@ -50,10 +50,13 @@ RabinClient::~RabinClient() {
 char *RabinClient::receive_file() {
 
         int block_num = 0;
+        char *block_data;
         while (receive_block != NULL) {
-                receive_block(block_num);
+                block_data = receive_block(block_num);
+                if (block_data == NULL && block_num == 0) return NULL;
                 block_num++;
         }
+        return block_data;
 } 
 
 

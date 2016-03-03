@@ -29,9 +29,10 @@ typedef struct __attribute__((__packed__)) block_desc {
 typedef struct __attribute__((__packed__)) block {
 
     unsigned block_num;
-    char *data;
     size_t data_size;
     bool old;
+    char *data;
+
 } block;
 
 

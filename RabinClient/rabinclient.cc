@@ -43,12 +43,17 @@ RabinClient::~RabinClient() {
 
 /* Receives a file from the server
  *
- * Does this by calling request_block
+ * Does this by calling receive_block
  *
  * Returns a pointer to null if nothing is received
  */
 char *RabinClient::receive_file() {
 
+        int block_num = 0;
+        while (receive_block != NULL) {
+                receive_block(block_num);
+                block_num++;
+        }
 } 
 
 
@@ -82,6 +87,26 @@ int RabinClient::connect_to_server() {
 
 /* This should probably eventually be a prvate function */
 unsigned RabinClient::insert_block (char *b, int size, int bno) {
+        block *new_block = new block;
+        unsigned n = hash_function(b, size);
+
+
+        new_block -> block_num = n;
+        new_block -> data_size = size;
+        new_block -> old = false;
+        new_block->data = new char[size];
+        memcpy(new_block -> data, b, size);
+
+        if(blocks.size() <= n) {
+                blocks.resize(2*n);
+        }
+
+        if(blocks.at(n) == NULL) {
+                blocks.at(n) = new_block;
+        } else {
+                blocks.at(n)-> old = true;
+        }
+        return n;
 
 }
 

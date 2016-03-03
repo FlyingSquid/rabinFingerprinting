@@ -46,37 +46,40 @@ RabinClient::~RabinClient() {
  * Does this by calling receive_block
  *
  * Returns a pointer to null if nothing is received
+ * Returns the whole file if file is received
  */
 char *RabinClient::receive_file() {
 
-        int block_num = 0;
         char *block_data;
-        while (receive_block != NULL) {
-                block_data = receive_block(block_num);
-                if (block_data == NULL && block_num == 0) return NULL;
-                block_num++;
-        }
-        return block_data;
+        char *whole_file;
+        do {
+                block_data = receive_block();
+                /* concatenate block data to whole file */ 
+        } while (receive_block() != NULL) 
+                 
+        return whole_file;
 } 
 
 
 /* Receives a block from the block cache */
-char *RabinClient::receive_block(int i) {
+char *RabinClient::receive_block() {
 
         block_desc bd;
         char *buf;
         int n = read(sockfd, &bd, sizeof(block_desc));
         unsigned s = bd.data_size;
-        buf = new char[size]; 
         if(n <= 0) {
                 return NULL;
         } else {
                 n = read(sockfd, buf, s);
         }
 
-        if(!bd.old)
+        if(!bd.old) {
+                buf = new char[size]; 
                 insert_block(buf, s, bd.block_num);
-
+        } else {
+                buf = get_block(bd.block_num);
+        }
 
         return buf;
 }

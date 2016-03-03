@@ -2,36 +2,57 @@
 #include <assert.h>
 
 /* Server name and port number*/
-RabinClient::RabinClient(char * hostname, int port_) {
+RabinClient::RabinClient(char *hostname, int port_) {
+        
+        portno = port_;
 
+        sockfd = socket(AF_INT, SOCK_STREAM, 0);
+        if (sockfd < 0) 
+                error("ERROR opening socket");
+        server = gethostbyname(hostname);
+        if (server == NULL) {
+                fprintf(stderr,"ERROR, no such host\n");
+                exit(0);
+        }
+
+        bzero((char *) &serv_addr, sizeof(serv_addr)); 
+        serv_addr.sin_family = AF_INET;
+        bcopy((char *)server->h_addr, 
+             (char *)&serv_addr.sin_addr.s_addr,
+             server->h_length);
+        serv_addr.sin_port = htons(portno); 
+
+        max_size = (blocks.max_size()) / 10000;
 }
 
 /* destructor */
 RabinClient::~RabinClient() {
 
+        close(newsockfd);
+        close(sockfd);
+        /* Need to destroy blocks here
+         * 
+         * Iterate through the vector block, free each element.
+         *
+         */
+        
+
 }
 
-/* Requests a file from the server
- *
- * When it receives blocks back from the server,
- * it stores the blocks where they need to be stored.
- *
- * Then recombines and returns a file
- *
- *
- * Requests to server are made in terms of blocks only
- *
- * Server caches only on content here, probably need to cache
- * on file name toooo
- *
+/* Receives a file (as blocks) from the server
+ * Does this by calling request_block
+ * Returns a pointer to null if nothing is received
  */
-char *RabinClient::request_file(char *file_name, size_t s) {
+char *RabinClient::receive_file() {
+
+} 
 
 
-}
-
-/* Requests a block from the block cache */
-int RabinClient::request_block(int i) {
+/* Requests a block from the server.
+ * If an 'old' block_desc is required, it just fishes the block from the local cache.
+ * Else, it adds the received block to the local cache and returns it.
+ */
+char *RabinClient::request_block(int i) {
 
 }
 

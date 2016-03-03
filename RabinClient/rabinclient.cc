@@ -1,8 +1,28 @@
 #include "rabinclient.h"
 #include <assert.h>
+#include <netinet/in.h>
+#include <netdb.h>
 
 /* Server name and port number*/
 RabinClient::RabinClient(char * hostname, int port_) {
+
+   portno = port_;
+
+   sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+   server = gethostbyname(hostname); 
+
+   if(server == NULL) {
+        error("Could not connect to host\n");
+   }
+
+   bzero((char *) &serv_addr, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr,
+        server->h_length);
+
+    serv_addr.sin_port = htons(portno);
+
 
 }
 
@@ -11,53 +31,59 @@ RabinClient::~RabinClient() {
 
 }
 
-/* Requests a file from the server
+/* Receives a file from the server
  *
- * When it receives blocks back from the server,
- * it stores the blocks where they need to be stored.
+ * Does this by calling request_block
  *
- * Then recombines and returns a file
- *
- *
- * Requests to server are made in terms of blocks only
- *
- * Server caches only on content here, probably need to cache
- * on file name toooo
- *
+ * Returns a pointer to null if nothing is received
  */
-char *RabinClient::request_file(char *file_name, size_t s) {
+char *RabinClient::receive_file(char *file_name, size_t s) {
 
 
 }
 
-/* Requests a block from the block cache */
-int RabinClient::request_block(int i) {
+/* Receives a block from the block cache */
+char *RabinClient::receive_block(int i) {
 
+    block_desc bd;
+    char *buf;
+    int n = read(sockfd, &bd, sizeof(block_desc));
+    unsigned s = bd.data_size;
+    buf = new char[size]; 
+    if(n <= 0) {
+        return NULL;
+    } else {
+        n = read(sockfd, buf, s);
+    }
+    
+    if(!bd.old)
+        insert_block(buf, s, bd.block_num);
+
+
+    return buf;
 }
 
 /* Establishes a connection to the server */
 int RabinClient::connect_to_server() {
 
+  return connect(sockfd,(struct sockaddr *)&serv_addr, sizeof(serv_addr));
+
 }
 
 /* This should probably eventually be a prvate function */
-unsigned RabinClient::insert_block (char *b, int size) {
+unsigned RabinClient::insert_block (char *b, int size, int bno) {
 
 }
 
 char *RabinClient::get_block(unsigned b) {
-
+    /* Copy from rabinserver */
 }
 
 /* Hash function to insert blocks to <blocks> */ 
 unsigned int RabinClient::hash_function(char *b, int size) {
-
+    /* Just copy hash_function from rabinserver*/
 }
 
-/* Rabin function */
-unsigned RabinClient::rabin_func (char b0, char b1, char b2, int i) {
-
-}
 
 void RabinClient::error(const char* msg)
 {

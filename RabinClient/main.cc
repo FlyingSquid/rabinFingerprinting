@@ -2,16 +2,12 @@
 
 int main (int argc, char *argv[]) {
 
-        if (argc < 2) {
-                cout << "Too few arguments" << endl;
-                exit(0);
-        }
 
-//        RabinClient *r = new RabinClient("dell24", 9260);
+        string server = "dell24";
+
+        RabinClient *r = new RabinClient((char *)server.c_str(), 9260);
         
-//        char *a = r->receive_file();
-
-//        cout << a << endl;
-
+        int a = r->receive_file(stdout);
+        cout << "Read " << a <<" blocks"<<endl;
         return 0;
 }

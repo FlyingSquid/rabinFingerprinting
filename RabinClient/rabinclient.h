@@ -44,20 +44,18 @@ class RabinClient
         RabinClient(char * hostname, int port_);
         ~RabinClient();
 
-        /* Receives a file (as blocks) from the server
-         *
-         * Does this by calling request_block
-         *
-         * Returns the number of blocks added to the file
-         *
-         * */
+        /*
+        * Receives a file from the server
+        * Returns the number of blocks added to the file
+        */
         unsigned receive_file(FILE *file); 
 
         /* Requests a block from the server.
-         * If an 'old' block_desc is required, it just fishes the block from the local cache.
-         *
-         * Else, it adds the received block to the local cache and returns i
-         */
+        * If an 'old' block_desc is required, it just fishes the block from
+        * the local cache.
+        *
+        * Else, it adds the received block to the local cache and returns it
+        */
         block *receive_block();
     
         /* Establishes a connection to the server */

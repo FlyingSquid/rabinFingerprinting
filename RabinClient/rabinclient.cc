@@ -99,7 +99,8 @@ block *RabinClient::receive_block() {
 /* Establishes a connection to the server */
 int RabinClient::connect_to_server() {
 
-        return connect(sockfd,(struct sockaddr *)&serv_addr, sizeof(serv_addr));
+        return connect(sockfd,(struct sockaddr *)&serv_addr, 
+                            sizeof(serv_addr));
 
 }
 

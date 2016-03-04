@@ -45,38 +45,41 @@ RabinClient::~RabinClient() {
  *
  * Does this by calling receive_block
  *
- * Returns a pointer to null if nothing is received
- * Returns the whole file if file is received
+ *
+ * file must be an open file pointer
+ *
  */
-char *RabinClient::receive_file() {
+unsigned RabinClient::receive_file(FILE *file) {
 
         /* NEED TO TEST */
-        char *block_data; 
-        char whole_file[100];
-        whole_file[0] = '\0';
-        do {
-                block_data = receive_block();
-                strcpy(whole_file, block_data);
-        } while (receive_block() != NULL) 
 
-        FILE *fp = fopen("wholefile.txt", "w");
-        int results = fputs(whole_file, fp);                
-        if (results == EOF) {
-                printf("error\n");
-        }
-        fclose(fp);
+        assert (file != NULL);
+
+        block *b; 
+        unsigned num_blocks = 0;
+        do {
+                b = receive_block();
+                if(b != NULL) {
+                    fwrite(b->data, b->data_size , 1, file);
+                    num_blocks++;
+                }
+
+        } while (b != NULL);
+
  
-        return fp;
+        return num_blocks;
 } 
 
 
 /* Receives a block from the block cache */
-char *RabinClient::receive_block() {
+block *RabinClient::receive_block() {
 
         block_desc bd;
         char *buf;
         int n = read(sockfd, &bd, sizeof(block_desc));
         unsigned s = bd.data_size;
+        buf = new char[s]; 
+        block *b;
         if(n <= 0) {
                 return NULL;
         } else {
@@ -84,13 +87,13 @@ char *RabinClient::receive_block() {
         }
 
         if(!bd.old) {
-                buf = new char[size]; 
-                insert_block(buf, s, bd.block_num);
-        } else {
-                buf = get_block(bd.block_num);
-        }
 
-        return buf;
+           insert_block(buf, s, bd.block_num);
+        }
+        delete buf;
+        b = get_block(bd.block_num);
+
+        return b;
 }
 
 /* Establishes a connection to the server */
@@ -101,7 +104,7 @@ int RabinClient::connect_to_server() {
 }
 
 /* This should probably eventually be a prvate function */
-unsigned RabinClient::insert_block (char *b, int size, int bno) {
+unsigned RabinClient::insert_block (char *b, unsigned size, unsigned bno) {
         block *new_block = new block;
         unsigned n = hash_function(b, size);
 
@@ -125,10 +128,15 @@ unsigned RabinClient::insert_block (char *b, int size, int bno) {
 
 }
 
-char *RabinClient::get_block(unsigned b) {
+block *RabinClient::get_block(unsigned b) {
         block *block_i = blocks.at(b);
-        char *to_return = new char[block_i -> data_size];
-        memcpy(to_return, block_i -> data, block_i -> data_size);
+        block *to_return = new block;
+
+        to_return->block_num = block_i -> block_num;
+        to_return -> data_size = block_i -> data_size;
+        to_return -> old = block_i -> old;
+        memcpy(to_return -> data, block_i -> data, block_i -> data_size);
+
         return to_return; 
 }
 

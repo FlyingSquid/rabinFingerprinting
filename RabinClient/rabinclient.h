@@ -48,26 +48,25 @@ class RabinClient
          *
          * Does this by calling request_block
          *
-         * Returns a pointer to null if nothing is received
+         * Returns the number of blocks added to the file
          *
          * */
-        char *receive_file(); 
+        unsigned receive_file(FILE *file); 
 
         /* Requests a block from the server.
          * If an 'old' block_desc is required, it just fishes the block from the local cache.
          *
-         * Else, it adds the received block to the local cache and returns it.
-         *
+         * Else, it adds the received block to the local cache and returns i
          */
-        char *receive_block(int i);
+        block *receive_block();
     
         /* Establishes a connection to the server */
         int connect_to_server();
 
         /* This should probably eventually be a prvate function */
-        unsigned insert_block (char *b, int size);
+        unsigned insert_block (char *b, unsigned size, unsigned bno);
         
-        char *get_block(unsigned b);
+        block *get_block(unsigned b);
 
     private:
         

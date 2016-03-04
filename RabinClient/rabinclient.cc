@@ -50,14 +50,23 @@ RabinClient::~RabinClient() {
  */
 char *RabinClient::receive_file() {
 
-        char *block_data;
-        char *whole_file;
+        /* NEED TO TEST */
+        char *block_data; 
+        char whole_file[100];
+        whole_file[0] = '\0';
         do {
                 block_data = receive_block();
-                /* concatenate block data to whole file */ 
+                strcpy(whole_file, block_data);
         } while (receive_block() != NULL) 
-                 
-        return whole_file;
+
+        FILE *fp = fopen("wholefile.txt", "w");
+        int results = fputs(whole_file, fp);                
+        if (results == EOF) {
+                printf("error\n");
+        }
+        fclose(fp);
+ 
+        return fp;
 } 
 
 

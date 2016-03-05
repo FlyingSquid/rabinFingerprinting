@@ -46,8 +46,6 @@ RabinClient::~RabinClient() {
  */
 unsigned RabinClient::receive_file(FILE *file) {
 
-        /* NEED TO TEST */
-
         assert (file != NULL);
 
         block *b; 
@@ -56,11 +54,13 @@ unsigned RabinClient::receive_file(FILE *file) {
                 b = receive_block();
                 if(b != NULL) {
                     fwrite(b->data, b->data_size , 1, file);
-                    num_blocks++;
                 }
+                
+                num_blocks++;
 
         } while (b != NULL);
 
+        fflush(file);
  
         return num_blocks;
 } 
@@ -72,20 +72,34 @@ block *RabinClient::receive_block() {
         block_desc bd;
         char *buf;
         int n = read(sockfd, &bd, sizeof(block_desc));
-        unsigned s = bd.data_size;
+        bd.block_num = ntohl(bd.block_num);
+        bd.data_size = ntohl(bd.data_size);
+
+        size_t s = bd.data_size;
+
+
+        if(n <= 0 || s <= 0) {
+                cerr <<"n = " <<n<<"  s = "<<s<<endl;
+                if (n != 0)
+                    cerr << "Block num " << bd.block_num<<endl;
+                return NULL;
+        }
+
+
+
         buf = new char[s]; 
         block *b;
-        if(n <= 0 || s <= 0) {
-                return NULL;
-        } else {
-                n = read(sockfd, buf, s);
-        }
+        cerr << "Received block " << bd.block_num;
+        cerr << ". Size " << s <<endl;
+        n = read(sockfd, buf, s);
 
         if(!bd.old) {
-
+            cerr << "Not old" <<endl;
            insert_block(buf, s, bd.block_num);
+        } else {
+            cerr << "Old" <<endl;
         }
-        delete buf;
+        
         b = get_block(bd.block_num);
 
         return b;
@@ -115,22 +129,22 @@ unsigned RabinClient::insert_block (char *b, unsigned size, unsigned bno) {
                 blocks.resize(2*n);
         }
 
-        if(blocks.at(n) == NULL) {
-                blocks.at(n) = new_block;
-        } else {
-                blocks.at(n)-> old = true;
-        }
+        blocks.at(n) = new_block;
+        
         return n;
 
 }
 
 block *RabinClient::get_block(unsigned b) {
 
+    /* TODO: Streamline and optimize this function */
+
         block *block_i = blocks.at(b);
         block *to_return = new block;
         to_return->block_num = block_i -> block_num;
         to_return -> data_size = block_i -> data_size;
         to_return -> old = block_i -> old;
+        to_return -> data = new char[block_i -> data_size];
         memcpy(to_return -> data, block_i -> data, block_i -> data_size);
 
         return to_return; 

@@ -7,10 +7,7 @@
  *  - Implement an actual Rabin Function to split blocks, current ne
  *    is tooo damn slow.
  *
- *  - Map file names to blocks somehow
- *
- *
- *
+ *  - Implement hash table instead of vector
  *
  *
  */
@@ -39,8 +36,8 @@ RabinServer::RabinServer(int port_) {
             error("ERROR on binding");
     }
 
-    max_size = (blocks.max_size()) / 10000;
-
+    //max_size = (blocks.max_size()) / 10000;
+    max_size = 100; /* Change this later */
 
 
 }
@@ -69,8 +66,6 @@ int RabinServer::connect_to_client() {
     
     if (n < 0) 
        error("Error reading from socket");
-
-    printf("message: %s\n", buffer);
 
     ************************************/
     return newsockfd;
@@ -118,18 +113,16 @@ int RabinServer::send_file(char *file, size_t s) {
 
     if(prev != file + s) {
         size_t width = file + s - prev; 
-        cout << "Extra with width ";
-        cout << width <<endl;
         block_num = insert_block(prev, width);
         write_block_to_client(block_num); 
         num_blocks++;
     }
 
-    /* TODO: EOF denoted by block_desc with 0 size*/
+    /* EOF denoted by block_desc with 0 size*/
 
     block_desc descriptor;
-    descriptor.block_num = 0;
-    descriptor.data_size = 0;
+    descriptor.block_num = htonl(0);
+    descriptor.data_size = htonl(0);
     descriptor.old = false;
 
     write(newsockfd, &descriptor, sizeof(block_desc));
@@ -169,8 +162,6 @@ int RabinServer::add_blocks(char *file, size_t s) {
 
     if(prev != file + s) {
         size_t width = file + s - prev; 
-        cout << "Extra with width ";
-        cout << width <<endl;
         insert_block(prev, width);
         num_blocks++;
     }
@@ -181,45 +172,54 @@ int RabinServer::add_blocks(char *file, size_t s) {
 
 unsigned RabinServer::rabin_func(char b0, char b1, char b2, int i) {
 
-    /* will implement a uniform random function here 
-     * Till then, this creates 2KB blocks */
+    /* will implement a uniform random function here */
 
     char hash_me[3];
     hash_me[0] = b0;
     hash_me[1] = b1;
     hash_me[2] = b2;
 
-    unsigned hashval = (hash_function(hash_me, 3) % 2048);
-
+    unsigned hashval = (hash_function(hash_me, 3) % 1024);
+/*
     if(hashval == 0) {
 
         cout<<i<<endl;
-    }
+    }*/
     return hashval;
 }
+/*
+ *
+ *  May htonl here
+ *
+ */
+
 
 int RabinServer::write_block_to_client(unsigned i) {
 
-    int n;
-
-    block *block_i = blocks.at(i);
     
+    int n;
+    block *block_i = blocks.at(i);
+   
     block_desc descriptor;
-    descriptor.block_num = block_i -> block_num;
-    descriptor.data_size = block_i -> data_size;
+    descriptor.block_num = htonl(block_i -> block_num);
+    descriptor.data_size = htonl(block_i -> data_size);
     descriptor.old = block_i -> old;
 
     n = write(newsockfd, &descriptor, sizeof(block_desc));
 
-    if(!block_i -> old) {
+    if (n < 0)
+        return n;
+
+    if(!descriptor.old) {
 
         char *data = (char *) block_i -> data;
+        n = write(newsockfd, data , block_i -> data_size);
 
-        if( n < 0) {
-            cerr << "Error writing to client" << endl;
-        } else {
-            n = write(newsockfd, data , block_i -> data_size);
-        }
+        cout << "Writing block "<< i <<" to the client. Size "<<block_i->data_size <<endl;
+    } else {
+
+        cout << "Writing block "<< i <<" to the client. "<< "Did not write data" <<endl;
+
     }
     return n;
 } 
@@ -238,10 +238,6 @@ char *RabinServer::get_block (unsigned b) {
 /* For now a simple djb2 hash, we should replace this 
  * when we can */
 unsigned int RabinServer::hash_function (char *b, int size) {
-
-
-    //cout << "Inserting block of width ";
-    //cout << size <<endl;
 
 
     char *str = new char[size+1];
@@ -282,6 +278,7 @@ unsigned RabinServer::insert_block(char *b, int size) {
     if(blocks.at(n) == NULL) {
         blocks.at(n) = new_block;
     } else {
+        delete (new_block);
         blocks.at(n)-> old = true;
     }
     return n;

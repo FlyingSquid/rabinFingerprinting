@@ -47,6 +47,8 @@ RabinServer::RabinServer(int port_) {
 
 int RabinServer::connect_to_client() {
 
+    cout << "Listening at port no "<< portno <<endl;
+
     /*Accept condition */
     listen(sockfd, 5);
     clilen = sizeof(cli_addr);
@@ -123,7 +125,15 @@ int RabinServer::send_file(char *file, size_t s) {
         num_blocks++;
     }
 
-    /* TODO: Probably need a sentinel to denot EOF here */
+    /* TODO: EOF denoted by block_desc with 0 size*/
+
+    block_desc descriptor;
+    descriptor.block_num = 0;
+    descriptor.data_size = 0;
+    descriptor.old = false;
+
+    write(newsockfd, &descriptor, sizeof(block_desc));
+    num_blocks++;
 
     return num_blocks;
 }

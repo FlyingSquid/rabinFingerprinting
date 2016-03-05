@@ -32,19 +32,14 @@ RabinClient::~RabinClient() {
         close(newsockfd);
         close(sockfd);
         /* Need to destroy blocks here
-         * 
-         * Iterate through the vector block, free each element.
-         *
+         *  Iterate through the vector block, free each element.
          */
-
-
 }
 
 
 /* Receives a file from the server
  *
  * Does this by calling receive_block
- *
  *
  * file must be an open file pointer
  *
@@ -80,7 +75,7 @@ block *RabinClient::receive_block() {
         unsigned s = bd.data_size;
         buf = new char[s]; 
         block *b;
-        if(n <= 0) {
+        if(n <= 0 || s <= 0) {
                 return NULL;
         } else {
                 n = read(sockfd, buf, s);
@@ -106,10 +101,10 @@ int RabinClient::connect_to_server() {
 
 /* This should probably eventually be a prvate function */
 unsigned RabinClient::insert_block (char *b, unsigned size, unsigned bno) {
+        
+
         block *new_block = new block;
-        unsigned n = hash_function(b, size);
-
-
+        unsigned n = bno;
         new_block -> block_num = n;
         new_block -> data_size = size;
         new_block -> old = false;
@@ -130,9 +125,9 @@ unsigned RabinClient::insert_block (char *b, unsigned size, unsigned bno) {
 }
 
 block *RabinClient::get_block(unsigned b) {
+
         block *block_i = blocks.at(b);
         block *to_return = new block;
-
         to_return->block_num = block_i -> block_num;
         to_return -> data_size = block_i -> data_size;
         to_return -> old = block_i -> old;
@@ -144,23 +139,16 @@ block *RabinClient::get_block(unsigned b) {
 /* Hash function to insert blocks to <blocks> */ 
 unsigned int RabinClient::hash_function(char *b, int size) {
 
-        //cout << "Inserting block of width ";
-        //cout << size <<endl;
-
-
         char *str = new char[size+1];
         memcpy(str, b, size);
         str[size] = 0;
-
         unsigned int hash = 5381;
         int c;
 
         while ((c = (*str))) {
                 str++;
                 hash = ((hash << 5) + hash) + c; /* hash * 33 + c*/
-
         }
-        //  delete str;
 
         return (hash % max_size);
 

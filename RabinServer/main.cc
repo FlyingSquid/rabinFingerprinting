@@ -7,7 +7,9 @@ int main (int argc, char* argv[]) {
         exit(0);
     }
 
-    RabinServer *r = new RabinServer(0);
+    RabinServer *r = new RabinServer(1024);
+
+    /*
     FILE *t = fopen(argv[1], "r");
 
     fseek(t, 0L, SEEK_END);
@@ -28,9 +30,15 @@ int main (int argc, char* argv[]) {
 
     char *x = r->get_block(n1);
     cout << x <<endl;
+    */
+
+
+    int a = r -> connect_to_client();
+    cout << a <<endl;
+
     delete (r);
 
-    return 1;
+    return 0;
 
 }
 

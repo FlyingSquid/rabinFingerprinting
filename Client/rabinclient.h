@@ -1,4 +1,7 @@
-
+/*
+ * Client for partial value-based web caching.
+ *
+ */
 #ifndef RabinClient_H
 #define RabinClient_H
 
@@ -72,17 +75,16 @@ class RabinClient
         unsigned int hash_function(char *b, int size);
        
         void error(const char* msg);
-        /* Private class variables go here */  
+        
+      /* Private class variables go here */  
 
         /* Simulates a local cache (in memory) */
         std::vector<block *> blocks;
         int portno, sockfd, newsockfd;
-
         struct hostent* server;
         sockaddr_in serv_addr;
-
         unsigned max_size;
-        /***********************************/
+      /***********************************/
 };
 
 #endif

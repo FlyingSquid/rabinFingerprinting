@@ -23,25 +23,27 @@ int main (int argc, char* argv[]) {
 
 
 
-    for(int i = 0; i < 1; i++) {
+    for(int i = 0; i < 2; i++) {
 
         int a = r->send_file((char *)c, n);
         cout <<  a << " blocks sent." << endl;
-        sleep(5);
+        sleep(2);
 
 
     }
 
+
 /*
-    string test = "ThisIsATestString";
+    string test = "ThisIsATestString\n";
     char *ctest = (char *)test.c_str();
     unsigned len = test.length();
     unsigned n1 = r->insert_block(ctest, len);
-
-    char *x = r->get_block(n1);
-    cout << x <<endl;
+    
+    for(int i = 0; i < 4; i++) {
+        r->write_block_to_client(n1);
+        sleep(1);
+    }
 */
-
 
     delete (r);
 

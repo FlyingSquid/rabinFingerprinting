@@ -9,7 +9,7 @@
  *
  *  - Implement hash table instead of vector
  *
- *
+ *  - The server doesn't actually have to store the blocks.
  */
 
 
@@ -37,7 +37,7 @@ RabinServer::RabinServer(int port_) {
     }
 
     //max_size = (blocks.max_size()) / 10000;
-    max_size = 100; /* Change this later */
+    max_size = 200; /* Change this later */
 
 
 }
@@ -55,19 +55,6 @@ int RabinServer::connect_to_client() {
     if(newsockfd < 0)
         error("Error on accept");
 
-
-    /* How to read from the client******
-
-    char buffer[256];
-    int n;
-    bzero(buffer, 256);
-
-    n = read(newsockfd, buffer, 255);
-    
-    if (n < 0) 
-       error("Error reading from socket");
-
-    ************************************/
     return newsockfd;
 
 }
@@ -187,11 +174,6 @@ unsigned RabinServer::rabin_func(char b0, char b1, char b2, int i) {
     }*/
     return hashval;
 }
-/*
- *
- *  May htonl here
- *
- */
 
 
 int RabinServer::write_block_to_client(unsigned i) {
@@ -214,11 +196,14 @@ int RabinServer::write_block_to_client(unsigned i) {
 
         char *data = (char *) block_i -> data;
         n = write(newsockfd, data , block_i -> data_size);
+        block_i -> old = true;
 
         cout << "Writing block "<< i <<" to the client. Size "<<block_i->data_size <<endl;
     } else {
 
-        cout << "Writing block "<< i <<" to the client. "<< "Did not write data" <<endl;
+        cout << "Writing block "<< i <<" to the client. "<<"Size "<<block_i->data_size;
+
+        cout<< ". Did not write data" <<endl;
 
     }
     return n;
@@ -252,7 +237,6 @@ unsigned int RabinServer::hash_function (char *b, int size) {
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c*/
 
     }
-  //  delete str;
    
     return (hash % max_size);
 
@@ -263,7 +247,6 @@ unsigned RabinServer::insert_block(char *b, int size) {
 
     block *new_block = new block;
     unsigned n = hash_function(b, size);
-
 
     new_block -> block_num = n;
     new_block -> data_size = size;

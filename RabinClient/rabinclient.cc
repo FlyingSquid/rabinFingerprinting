@@ -72,37 +72,40 @@ block *RabinClient::receive_block() {
         block_desc bd;
         char *buf;
         int n = read(sockfd, &bd, sizeof(block_desc));
+
+        if(n <= 0) {
+            error("Error: Connection may have been closed.");
+        }
+
         bd.block_num = ntohl(bd.block_num);
         bd.data_size = ntohl(bd.data_size);
 
         size_t s = bd.data_size;
 
 
-        if(n <= 0 || s <= 0) {
-                cerr <<"n = " <<n<<"  s = "<<s<<endl;
-                if (n != 0)
-                    cerr << "Block num " << bd.block_num<<endl;
+        if(s <= 0) {
+
+                cerr << "Received EOF\n"<<endl;
                 return NULL;
         }
 
 
 
         buf = new char[s]; 
-        block *b;
+
+
         cerr << "Received block " << bd.block_num;
         cerr << ". Size " << s <<endl;
-        n = read(sockfd, buf, s);
 
         if(!bd.old) {
+            n = read(sockfd, buf, s);
             cerr << "Not old" <<endl;
-           insert_block(buf, s, bd.block_num);
+            insert_block(buf, s, bd.block_num);
         } else {
             cerr << "Old" <<endl;
         }
         
-        b = get_block(bd.block_num);
-
-        return b;
+        return get_block(bd.block_num);
 }
 
 /* Establishes a connection to the server */
@@ -121,9 +124,9 @@ unsigned RabinClient::insert_block (char *b, unsigned size, unsigned bno) {
         unsigned n = bno;
         new_block -> block_num = n;
         new_block -> data_size = size;
-        new_block -> old = false;
-        new_block->data = new char[size];
-        memcpy(new_block -> data, b, size);
+        /* Redundant here */
+        new_block -> old = true;
+        new_block->data = b;
 
         if(blocks.size() <= n) {
                 blocks.resize(2*n);
@@ -150,23 +153,6 @@ block *RabinClient::get_block(unsigned b) {
         return to_return; 
 }
 
-/* Hash function to insert blocks to <blocks> */ 
-unsigned int RabinClient::hash_function(char *b, int size) {
-
-        char *str = new char[size+1];
-        memcpy(str, b, size);
-        str[size] = 0;
-        unsigned int hash = 5381;
-        int c;
-
-        while ((c = (*str))) {
-                str++;
-                hash = ((hash << 5) + hash) + c; /* hash * 33 + c*/
-        }
-
-        return (hash % max_size);
-
-}
 
 void RabinClient::error(const char* msg)
 {

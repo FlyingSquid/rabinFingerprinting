@@ -1,5 +1,11 @@
 #include "rabinserver.h"
 
+/*
+ * Example use of rabinserver.h
+ *
+ * Transfers a file in command line arguments over a network.
+ */
+
 int main (int argc, char* argv[]) {
 
     if(argc < 2) {
@@ -7,8 +13,11 @@ int main (int argc, char* argv[]) {
         exit(0);
     }
 
+    /* Creating an instance of the server, open at port 1024 */
     RabinServer *r = new RabinServer(1024);
-    /******** This could be abstracted to the class itself */ 
+
+
+    /******** Storing the input file in a char array   */ 
     FILE *t = fopen(argv[1], "r");
 
     fseek(t, 0L, SEEK_END);
@@ -18,33 +27,21 @@ int main (int argc, char* argv[]) {
     char c[n];
     fread(c, n, 1, t);
     /****************************************************/
-    
+   
+    /* Connectng to the client */ 
     r -> connect_to_client();
 
 
-
+    /*Sending the input file twice, logging the blocks sent */
     for(int i = 0; i < 2; i++) {
 
         int a = r->send_file((char *)c, n);
         cout <<  a << " blocks sent." << endl;
         sleep(2);
-
-
     }
 
 
-/*
-    string test = "ThisIsATestString\n";
-    char *ctest = (char *)test.c_str();
-    unsigned len = test.length();
-    unsigned n1 = r->insert_block(ctest, len);
-    
-    for(int i = 0; i < 4; i++) {
-        r->write_block_to_client(n1);
-        sleep(1);
-    }
-*/
-
+    /* Deleting the class, this should invoke the destructor */
     delete (r);
 
     return 0;

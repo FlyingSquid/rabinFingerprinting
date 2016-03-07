@@ -1,5 +1,7 @@
 /*
- * Client for partial value-based web caching.
+ * FLying Squid
+ *--------------------
+ * Client-side library for partial value-based web caching.
  *
  */
 #ifndef RabinClient_H
@@ -76,8 +78,6 @@ class RabinClient
        
         void error(const char* msg);
         
-      /* Private class variables go here */  
-
         /* Simulates a local cache (in memory) */
         std::vector<block *> blocks;
         int portno, sockfd, newsockfd;

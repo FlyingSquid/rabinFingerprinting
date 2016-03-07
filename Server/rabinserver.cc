@@ -40,14 +40,14 @@ RabinServer::RabinServer(int port_) {
 
 int RabinServer::connect_to_client() {
 
-    cout << "Listening at port no "<< portno <<endl;
+    cerr << "Listening at port no "<< portno <<endl;
 
-    /*Accept condition */
     listen(sockfd, 5);
     clilen = sizeof(cli_addr);
     newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr,
                                     &clilen);
 
+    /*Accept condition */
     if(newsockfd < 0)
         error("Error on accept");
 
@@ -78,7 +78,7 @@ int RabinServer::send_file(char *file, size_t s) {
     int num_blocks = 0;
     unsigned block_num;
 
-    cout << "Size of file is " << s << endl;
+    cerr << "Size of file is " << s << endl;
 
     for(i = 2; i < s; i++) {
         
@@ -117,7 +117,10 @@ int RabinServer::send_file(char *file, size_t s) {
 
 
 
-// Returns the number of blocks sent
+/* Returns the number of blocks sent
+ *
+ * This function exists only for testing purposes.
+ * */
 int RabinServer::add_blocks(char *file, size_t s) {
 
     /* Break file into blocks, then for each of these
@@ -129,7 +132,7 @@ int RabinServer::add_blocks(char *file, size_t s) {
     char *prev = file;
     int num_blocks = 0;
 
-    cout << "Size of file is " << s << endl;
+    cerr << "Size of file is " << s << endl;
 
     for(i = 2; i < s; i++) {
         
@@ -189,11 +192,11 @@ int RabinServer::write_block_to_client(unsigned i) {
         n = write(newsockfd, data , block_i -> data_size);
         block_i -> old = true;
 
-        cout << "Writing block "<< i <<" to the client. Size "<<block_i->data_size <<endl;
+        cerr << "Writing block "<< i <<" to the client. Size "<<block_i->data_size <<endl;
     } else {
 
-        cout << "Writing block "<< i <<" to the client. Size "<<block_i->data_size;
-        cout<< ". Did not write data" <<endl;
+        cerr << "Writing block "<< i <<" to the client. Size "<<block_i->data_size;
+        cerr<< ". Did not write data" <<endl;
 
     }
     return n;

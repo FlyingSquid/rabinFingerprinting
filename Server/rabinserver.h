@@ -1,3 +1,12 @@
+/*
+ * Flying Squid
+ * ------------
+ * 
+ * Rabin Fingerprinting Server-side Library
+ *
+ *
+ */
+
 
 #ifndef RabinServer_H
 #define RabinServer_H
@@ -74,9 +83,6 @@ class RabinServer
        
         void error(const char* msg);
 
-
-
-        /* Private class variables go here */  
 
         /* Simulates a local cache (in memory) */
         std::vector<block *> blocks;

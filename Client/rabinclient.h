@@ -1,5 +1,5 @@
 /*
- * FLying Squid
+ * Flying Squid
  *--------------------
  * Client-side library for partial value-based web caching.
  *
@@ -50,23 +50,24 @@ class RabinClient
         ~RabinClient();
 
         /*
-        * Receives a file from the server
+        * Receives a file from the server into the open, write enabled
+        * file pointer 'file'.
         * Returns the number of blocks added to the file
         */
         unsigned receive_file(FILE *file); 
 
         /* Requests a block from the server.
-        * If an 'old' block_desc is required, it just fishes the block from
-        * the local cache.
+        * 
+        *   If an 'old' block_desc is required, it just fishes the block from
+        *   the local cache.
         *
-        * Else, it adds the received block to the local cache and returns it
+        *   Else, it adds the received block to the local cache and returns it
         */
         block *receive_block();
     
         /* Establishes a connection to the server */
         int connect_to_server();
 
-        /* This should probably eventually be a prvate function */
         unsigned insert_block (char *b, unsigned size, unsigned bno);
         
         block *get_block(unsigned b);
@@ -83,6 +84,8 @@ class RabinClient
         int portno, sockfd, newsockfd;
         struct hostent* server;
         sockaddr_in serv_addr;
+
+        /* Max size of local store */
         unsigned max_size;
       /***********************************/
 };

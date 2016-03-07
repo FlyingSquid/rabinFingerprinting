@@ -6,7 +6,7 @@ This repository holds a library that implements a set of functions that allow fo
 
 ## Protocol
 
-The custom protocol implemented is described in the paper Value Based Web Caching.
+The custom protocol implemented is described in the paper [Value Based Web Caching](http://www.cs.berkeley.edu/~brewer/papers/vbwc.pdf).
 
 This implementation is hidden from the end user. `block_desc` structs are used to implement custom headers, and files are sent as character blocks.
 

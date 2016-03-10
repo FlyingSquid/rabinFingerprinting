@@ -11,7 +11,7 @@
 #ifndef RabinServer_H
 #define RabinServer_H
 
-
+#include <unordered_map>
 #include <vector>
 #include <functional>
 #include <stdio.h>
@@ -83,7 +83,7 @@ class RabinServer
        
         void error(const char* msg);
 
-
+        std::unordered_map<unsigned, block *> blocks2;
         /* Simulates a local cache (in memory) */
         std::vector<block *> blocks;
 

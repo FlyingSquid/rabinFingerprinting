@@ -83,9 +83,10 @@ class RabinServer
        
         void error(const char* msg);
 
-        std::unordered_map<unsigned, block *> blocks2;
+
         /* Simulates a local cache (in memory) */
-        std::vector<block *> blocks;
+        std::unordered_map<unsigned, block *> blocks;
+        //std::vector<block *> blocks;
 
         int portno, sockfd, newsockfd;
         sockaddr_in serv_addr, cli_addr;

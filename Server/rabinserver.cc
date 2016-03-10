@@ -83,15 +83,18 @@ int RabinServer::send_file(char *file, size_t s) {
     unsigned block_num;
 
     cerr << "Size of file is " << s << endl;
-
     for(i = 2; i < s; i++) {
         
         if(rabin_func(file[i-2], file[i-1],file[i],i) == 0) {
             /* This is some pointer addition that gives the
              * size of the block */
             size_t width = (file + i - prev);
-           
+            cerr<<"Insert"<<endl;
+            fflush(stderr);
             block_num = insert_block(prev, width);
+            cerr<<"Write"<<endl;
+
+            fflush(stderr);
             write_block_to_client(block_num); 
             prev = file + i;
             num_blocks++; 
@@ -179,7 +182,8 @@ int RabinServer::write_block_to_client(unsigned i) {
     
     int n;
     block *block_i = blocks.at(i);
-   
+
+    //Get block_i
     block_desc descriptor;
     descriptor.block_num = htonl(block_i -> block_num);
     descriptor.data_size = htonl(block_i -> data_size);
@@ -242,25 +246,32 @@ unsigned int RabinServer::hash_function (char *b, int size) {
 /* Returns the block number */
 unsigned RabinServer::insert_block(char *b, int size) {
 
+
+
+
     block *new_block = new block;
     unsigned n = hash_function(b, size);
-
     new_block -> block_num = n;
     new_block -> data_size = size;
     new_block -> old = false;
     new_block->data = new char[size];
     memcpy(new_block -> data, b, size);
-   
+  
+    /* 
     if(blocks.size() <= n) {
        blocks.resize(2*n);
-    }
-   
-    if(blocks.at(n) == NULL) {
-        blocks.at(n) = new_block;
-    } else {
+    }*/
+
+    /* Catch is not catching the error here */
+    try {
+        blocks.at(n) -> old = true;
+
         delete (new_block);
-        blocks.at(n)-> old = true;
     }
+    catch (const std::out_of_range & oor) {
+        blocks[n] = new_block;
+        
+    } 
     return n;
 }
 

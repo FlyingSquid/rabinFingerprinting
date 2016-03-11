@@ -8,7 +8,7 @@
 #define RabinClient_H
 
 
-#include <vector>
+#include <unordered_map>
 #include <functional>
 #include <stdio.h>
 #include <stdlib.h>
@@ -80,7 +80,7 @@ class RabinClient
         void error(const char* msg);
         
         /* Simulates a local cache (in memory) */
-        std::vector<block *> blocks;
+        std::unordered_map<unsigned, block *> blocks;
         int portno, sockfd, newsockfd;
         struct hostent* server;
         sockaddr_in serv_addr;

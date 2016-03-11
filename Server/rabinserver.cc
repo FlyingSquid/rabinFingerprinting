@@ -36,8 +36,7 @@ RabinServer::RabinServer(int port_) {
             error("ERROR on binding");
     }
 
-    //max_size = (blocks.max_size()) / 10000;
-    max_size = 200; /* Change this later */
+    max_size = (blocks.max_size()) / 10000;
 
 
 }
@@ -257,15 +256,9 @@ unsigned RabinServer::insert_block(char *b, int size) {
     new_block->data = new char[size];
     memcpy(new_block -> data, b, size);
   
-    /* 
-    if(blocks.size() <= n) {
-       blocks.resize(2*n);
-    }*/
-
     /* Catch is not catching the error here */
     try {
         blocks.at(n) -> old = true;
-
         delete (new_block);
     }
     catch (const std::out_of_range & oor) {

@@ -89,10 +89,7 @@ block *RabinClient::receive_block() {
                 return NULL;
         }
 
-
-
         buf = new char[s]; 
-
 
         cerr << "Received block " << bd.block_num;
         cerr << ". Size " << s <<endl;
@@ -128,11 +125,7 @@ unsigned RabinClient::insert_block (char *b, unsigned size, unsigned bno) {
         new_block -> old = true;
         new_block->data = b;
 
-        if(blocks.size() <= n) {
-                blocks.resize(2*n);
-        }
-
-        blocks.at(n) = new_block;
+        blocks[n] = new_block;
         
         return n;
 

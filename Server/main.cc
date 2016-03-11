@@ -8,7 +8,7 @@
 
 int main (int argc, char* argv[]) {
 
-    if(argc < 2) {
+    if(argc < 3) {
         cout << "Too few arguments" <<endl;
         exit(0);
     }
@@ -27,18 +27,32 @@ int main (int argc, char* argv[]) {
     char c[n];
     fread(c, n, 1, t);
     /****************************************************/
-   
+  
+    FILE *t_ = fopen(argv[2], "r");
+
+    fseek(t_, 0L, SEEK_END);
+    n = ftell(t);
+    fseek(t_, 0L, SEEK_SET);
+
+    char c_[n];
+    fread(c_, n, 1, t_);
+
+
+
+
+    /****************************************************/
+ 
     /* Connectng to the client */ 
     r -> connect_to_client();
 
 
-    /*Sending the input file twice, logging the blocks sent */
-    for(int i = 0; i < 2; i++) {
+    printf("Sending %s\n",argv[1]);
+    int a = r->send_file((char *)c, n);
+    cout <<  a << " blocks sent." << endl;
 
-        int a = r->send_file((char *)c, n);
-        cout <<  a << " blocks sent." << endl;
-        sleep(2);
-    }
+    printf("Sending %s\n",argv[2]);
+    a = r -> send_file((char *)c_, n);
+    cout <<  a << " blocks sent." << endl;
 
 
     /* Deleting the class, this should invoke the destructor */

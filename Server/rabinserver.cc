@@ -83,17 +83,22 @@ int RabinServer::send_file(char *file, size_t s) {
 
     cerr << "Size of file is " << s << endl;
     for(i = 2; i < s; i++) {
-        
-        if(rabin_func(file[i-2], file[i-1],file[i],i) == 0) {
+       
+        /* Establishes a max size of a block*/
+
+        bool too_large = (((file + i) - prev) >= max_bytes);
+
+        /*************************/
+
+ 
+        if(rabin_func(file[i-2], file[i-1],file[i],i) == 0
+            || too_large
+) {
             /* This is some pointer addition that gives the
              * size of the block */
             size_t width = (file + i - prev);
-            cerr<<"Insert"<<endl;
-            fflush(stderr);
             block_num = insert_block(prev, width);
-            cerr<<"Write"<<endl;
-
-            fflush(stderr);
+            
             write_block_to_client(block_num); 
             prev = file + i;
             num_blocks++; 
@@ -120,46 +125,10 @@ int RabinServer::send_file(char *file, size_t s) {
     return num_blocks;
 }
 
-
-
-
-/* Returns the number of blocks sent
+/*
+ * This function hardly gives any 0s
  *
- * This function exists only for testing purposes.
- * */
-int RabinServer::add_blocks(char *file, size_t s) {
-
-    /* Break file into blocks, then for each of these
-     * blocks call insert_block */
-
-
-    assert (file != NULL);
-    unsigned i;
-    char *prev = file;
-    int num_blocks = 0;
-
-    cerr << "Size of file is " << s << endl;
-
-    for(i = 2; i < s; i++) {
-        
-        if(rabin_func(file[i-2], file[i-1],file[i],i) == 0) {
-            /* This is some pointer addition that gives the
-             * size of the block */
-            size_t width = (file + i - prev);
-            insert_block(prev, width);
-            num_blocks++; 
-            prev = file + i;
-        } 
-    } 
-
-    if(prev != file + s) {
-        size_t width = file + s - prev; 
-        insert_block(prev, width);
-        num_blocks++;
-    }
-
-    return num_blocks;
-}
+ */
 
 
 unsigned RabinServer::rabin_func(char b0, char b1, char b2, int i) {
@@ -171,7 +140,8 @@ unsigned RabinServer::rabin_func(char b0, char b1, char b2, int i) {
     hash_me[1] = b1;
     hash_me[2] = b2;
 
-    unsigned hashval = (hash_function(hash_me, 3) % 1024);
+    unsigned hashval = (hash_function(hash_me, 3) % (max_bytes/2));
+
     return hashval;
 }
 
@@ -247,7 +217,6 @@ unsigned RabinServer::insert_block(char *b, int size) {
 
 
 
-
     block *new_block = new block;
     unsigned n = hash_function(b, size);
     new_block -> block_num = n;
@@ -256,8 +225,13 @@ unsigned RabinServer::insert_block(char *b, int size) {
     new_block->data = new char[size];
     memcpy(new_block -> data, b, size);
   
-    /* Catch is not catching the error here */
     try {
+        /* Maybe get a block here and check if th contents are equal
+     
+            If not equal, replace the block. Otherwise there are correctness
+            issues.
+
+        ***********************************************************/
         blocks.at(n) -> old = true;
         delete (new_block);
     }

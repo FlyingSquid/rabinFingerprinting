@@ -84,7 +84,6 @@ block *RabinClient::receive_block() {
 
 
         if(s <= 0) {
-
                 cerr << "Received EOF\n"<<endl;
                 return NULL;
         }

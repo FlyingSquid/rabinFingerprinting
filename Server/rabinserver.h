@@ -90,7 +90,7 @@ class RabinServer
         int portno, sockfd, newsockfd;
         sockaddr_in serv_addr, cli_addr;
         socklen_t clilen;
-
+        unsigned const max_bytes = 1024; /* Maximum size of a block */
         unsigned max_size;
         /***********************************/
 };

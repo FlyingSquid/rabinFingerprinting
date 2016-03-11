@@ -13,7 +13,7 @@ int main (int argc, char *argv[]) {
 
         for(int i = 0; i < 2; i++) {        
             a = r->  receive_file(stdout);
-            cerr << "Received " << a <<" blocks."<<endl;
+            cerr << "Received " << a <<" blocks.\n\n"<<endl;
         }
         delete (r);
 

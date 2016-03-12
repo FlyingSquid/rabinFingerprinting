@@ -69,6 +69,8 @@ unsigned RabinClient::receive_file(FILE *file) {
 /* Receives a block from the block cache */
 block *RabinClient::receive_block() {
 
+
+        sleep(1);
         block_desc bd;
         char *buf;
         int n = read(sockfd, &bd, sizeof(block_desc));

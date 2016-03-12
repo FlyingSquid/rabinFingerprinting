@@ -11,7 +11,7 @@ int main (int argc, char *argv[]) {
         int a = r->connect_to_server();
 
 
-        for(int i = 0; i < 1; i++) {        
+        for(int i = 0; i < 2; i++) {        
             a = r->  receive_file(stdout);
             cerr << "Received " << a <<" blocks.\n\n"<<endl;
         }

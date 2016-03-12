@@ -91,12 +91,22 @@ block *RabinClient::receive_block() {
         cerr<< ". Old " <<bd.old<<endl;
 
         if(!bd.old) {
-            
+           
             buf = new char[s]; 
-            
-            n = read(sockfd, buf, s);
 
-           // sleep(1);
+            unsigned bytesRead;
+
+
+            /* This will happen if there is not sufficient time
+            * to read the entire data stream */
+            while(bytesRead < s) {
+
+                /* Network may be too fast */            
+                n = read(sockfd, buf + bytesRead, s - bytesRead);
+                bytesRead += n;
+            }
+ 
+
             insert_block(buf, s, bd.block_num);
 
         }

@@ -86,14 +86,13 @@ int RabinServer::send_file(char *file, size_t s) {
        
         /* Establishes a max size of a block*/
 
-        bool too_large = (((file + i) - prev) >= max_bytes);
+        bool too_large = /*(((file + i) - prev) >= max_bytes)*/false;
 
         /*************************/
 
  
         if(rabin_func(file[i-2], file[i-1],file[i],i) == 0
-            || too_large
-) {
+            || too_large) {
             /* This is some pointer addition that gives the
              * size of the block */
             size_t width = (file + i - prev);
@@ -163,18 +162,18 @@ int RabinServer::write_block_to_client(unsigned i) {
     if (n < 0)
         return n;
 
+
+        cerr << "Writing block "<< i <<" to the client. Size "<<block_i->data_size << "." <<endl;
+
     if(!descriptor.old) {
 
         char *data = (char *) block_i -> data;
         n = write(newsockfd, data , block_i -> data_size);
         block_i -> old = true;
 
-        cerr << "Writing block "<< i <<" to the client. Size "<<block_i->data_size <<endl;
     } else {
 
-        cerr << "Writing block "<< i <<" to the client. Size "<<block_i->data_size;
-        cerr<< ". Did not write data" <<endl;
-
+        cerr<< "Did not write data" <<endl;
     }
     return n;
 } 

@@ -69,8 +69,6 @@ unsigned RabinClient::receive_file(FILE *file) {
 /* Receives a block from the block cache */
 block *RabinClient::receive_block() {
 
-
-        sleep(1);
         block_desc bd;
         char *buf;
         int n = read(sockfd, &bd, sizeof(block_desc));
@@ -96,7 +94,7 @@ block *RabinClient::receive_block() {
            
             buf = new char[s]; 
 
-            unsigned bytesRead;
+            unsigned bytesRead = 0;
 
 
             /* This will happen if there is not sufficient time
@@ -107,8 +105,8 @@ block *RabinClient::receive_block() {
                 n = read(sockfd, buf + bytesRead, s - bytesRead);
                 bytesRead += n;
             }
- 
-
+            /* Used to have an error when bytesRead exceeded s*/
+            
             insert_block(buf, s, bd.block_num);
 
         }

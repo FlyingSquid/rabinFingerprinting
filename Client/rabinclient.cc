@@ -81,24 +81,24 @@ block *RabinClient::receive_block() {
         bd.data_size = ntohl(bd.data_size);
 
         size_t s = bd.data_size;
-
-
+    
         if(s <= 0) {
                 cerr << "Received EOF\n"<<endl;
                 return NULL;
         }
 
-        buf = new char[s]; 
-
-        cerr << "Received block " << bd.block_num;
-        cerr << ". Size " << s <<endl;
+        cerr << "\n\nReceived block " << bd.block_num<<". Size " << s;
+        cerr<< ". Old " <<bd.old<<endl;
 
         if(!bd.old) {
+            
+            buf = new char[s]; 
+            
             n = read(sockfd, buf, s);
-            cerr << "Not old" <<endl;
+
+           // sleep(1);
             insert_block(buf, s, bd.block_num);
-        } else {
-            cerr << "Old" <<endl;
+
         }
         
         return get_block(bd.block_num);

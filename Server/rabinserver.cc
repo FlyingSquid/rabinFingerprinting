@@ -86,7 +86,7 @@ int RabinServer::send_file(char *file, size_t s) {
        
         /* Establishes a max size of a block*/
 
-        bool too_large = (((file + i) - prev) >= max_bytes) && false;
+        bool too_large = (((file + i) - prev) >= max_bytes);
 
         /*************************/
 

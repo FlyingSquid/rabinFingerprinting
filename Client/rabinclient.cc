@@ -71,7 +71,14 @@ block *RabinClient::receive_block() {
 
         block_desc bd;
         char *buf;
+
+        /* This read is also not completed in time over slow networks */
         int n = read(sockfd, &bd, sizeof(block_desc));
+
+        if(n != sizeof(block_desc)) {
+            cerr<<"n was "<<n<<" size is "<<sizeof(block_desc)<<endl;
+            error("This needs to be fixed");
+        }
 
         if(n <= 0) {
             error("Error: Connection may have been closed.");

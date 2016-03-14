@@ -69,11 +69,11 @@ unsigned RabinClient::receive_file(FILE *file) {
 /* Receives a block from the block cache */
 block *RabinClient::receive_block() {
 
-        block_desc bd;
+        block_desc *bd = new block_desc;
         char *buf;
 
         /* This read is also not completed in time over slow networks */
-        int n = read(sockfd, &bd, sizeof(block_desc));
+        int n = read(sockfd, bd, sizeof(block_desc));
 
         if(n != sizeof(block_desc)) {
             cerr<<"n was "<<n<<" size is "<<sizeof(block_desc)<<endl;
@@ -84,20 +84,19 @@ block *RabinClient::receive_block() {
             error("Error: Connection may have been closed.");
         }
 
-        bd.block_num = ntohl(bd.block_num);
-        bd.data_size = ntohl(bd.data_size);
-
-        size_t s = bd.data_size;
+        unsigned block_num = ntohl(bd->block_num);
+        size_t s = ntohl(bd->data_size);
+        bool old = bd->old;
     
         if(s <= 0) {
                 cerr << "Received EOF\n"<<endl;
                 return NULL;
         }
 
-        cerr << "\n\nReceived block " << bd.block_num<<". Size " << s;
-        cerr<< ". Old " <<bd.old<<endl;
+        cerr << "\n\nReceived block " << block_num<<". Size " << s;
+        cerr<< ". Old " <<old<<endl;
 
-        if(!bd.old) {
+        if(!old) {
            
             buf = new char[s]; 
 
@@ -114,11 +113,13 @@ block *RabinClient::receive_block() {
             }
             /* Used to have an error when bytesRead exceeded s*/
             
-            insert_block(buf, s, bd.block_num);
+            insert_block(buf, s, block_num);
 
         }
         
-        return get_block(bd.block_num);
+        delete bd;
+
+        return get_block(block_num);
 }
 
 /* Establishes a connection to the server */

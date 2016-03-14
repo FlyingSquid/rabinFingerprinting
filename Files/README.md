@@ -3,7 +3,7 @@
 Holds sets of files with different deltas. These are used for statistical
 testing.
 
-## Subdirectorues
+## Subdirectories
 
 - Haskell: One file has an added byte.
 

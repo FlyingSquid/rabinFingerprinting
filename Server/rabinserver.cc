@@ -222,14 +222,16 @@ unsigned RabinServer::insert_block(char *b, int size) {
     memcpy(new_block -> data, b, size);
   
     try {
-        /* Maybe get a block here and check if th contents are equal
-     
-            If not equal, replace the block. Otherwise there are correctness
-            issues.
-
-        ***********************************************************/
-        blocks.at(n) -> old = true;
-        delete (new_block);
+        block *cur = blocks.at(n);
+        if(cur->data_size != (unsigned)size || memcmp(cur->data, b, size)) {
+            cerr<<"Overwriting current block"<<endl;
+            blocks[n] = new_block;
+            delete cur;
+        } else {
+            blocks.at(n) -> old = true;
+        
+            delete (new_block);
+        }
     }
     catch (const std::out_of_range & oor) {
         blocks[n] = new_block;

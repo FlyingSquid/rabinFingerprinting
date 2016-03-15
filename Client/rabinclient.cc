@@ -155,8 +155,13 @@ unsigned RabinClient::insert_block (char *b, unsigned size, unsigned bno) {
         new_block -> old = true;
         new_block->data = b;
 
+        try {
+            block *cur = blocks.at(n);
+            delete cur;
+
+        } catch (const std::out_of_range & oor) {}
+
         blocks[n] = new_block;
-        
         return n;
 
 }

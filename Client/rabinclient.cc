@@ -69,20 +69,33 @@ unsigned RabinClient::receive_file(FILE *file) {
 /* Receives a block from the block cache */
 block *RabinClient::receive_block() {
 
-        block_desc *bd = new block_desc;
+        block_desc *bd;
         char *buf;
+        char *bd_buf = new char [sizeof(block_desc)];
+        unsigned br = 0;  /* bytes read*/
+        int n;
 
-        /* This read is also not completed in time over slow networks */
+        /* Network may be too slow to read header in once chunk */
+        while(br < sizeof(block_desc)) {
+
+                n = read(sockfd, bd_buf + br, sizeof(block_desc) - br);
+                
+                if(n <= 0) {
+                    error("Error: Connection may have been closed.");
+                }
+
+                br += n;
+        }
+
+        bd = (block_desc *)bd_buf;
+/*
         int n = read(sockfd, bd, sizeof(block_desc));
 
         if(n != sizeof(block_desc)) {
             cerr<<"n was "<<n<<" size is "<<sizeof(block_desc)<<endl;
             error("This needs to be fixed");
         }
-
-        if(n <= 0) {
-            error("Error: Connection may have been closed.");
-        }
+*/
 
         unsigned block_num = ntohl(bd->block_num);
         size_t s = ntohl(bd->data_size);

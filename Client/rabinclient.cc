@@ -1,3 +1,13 @@
+/*
+ * Flying Squid
+ *------------------
+ *
+ * Implementation of RabinClient
+ *
+ */
+
+
+
 #include "rabinclient.h"
 #include <assert.h>
 #include <netinet/in.h>

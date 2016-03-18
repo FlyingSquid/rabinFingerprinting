@@ -7,9 +7,6 @@
  * ------------------
  *Implementation of RabinServer
  *
- * TODO:
- *
- *  - Implement hash table instead of vector
  */
 
 

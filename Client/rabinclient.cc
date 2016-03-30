@@ -115,10 +115,9 @@ block *RabinClient::receive_block() {
                 cerr << "Received EOF\n"<<endl;
                 return NULL;
         }
-
         cerr << "\n\nReceived block " << block_num<<". Size " << s;
         cerr<< ". Old " <<old<<endl;
-
+        
         if(!old) {
            
             buf = new char[s]; 

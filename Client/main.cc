@@ -9,18 +9,27 @@ int main (int argc, char *argv[]) {
         RabinClient *r = new RabinClient(argv[1], port);
         
         int a = r->connect_to_server();
+        
+        if (a < 0) {
+            cerr<<"Could not connect"<<endl;
+            exit(1);
+        }
 
-        FILE *f = fopen(argv[3], "w+");
         string s1 = argv[3];
         int go=1;
-        while(go){        
+        while(go){
+
+            FILE *f = fopen(argv[3], "w+");
+
             a = r->  receive_file(f);
             fflush(f);
-            //cerr << "Received " << a <<" blocks.\n\n"<<endl;
-            //
-            string s = "firefox 'pwd'/" + s1;
-            system(s1.c_str());
-            cin >> a;
+
+            cerr << "Received " << a <<" blocks.\n\n"<<endl;
+            
+            string s = "xdg-open " + s1;
+            system(s.c_str());
+            cin >> go;
+            fclose(f);
         }
         delete (r);
 

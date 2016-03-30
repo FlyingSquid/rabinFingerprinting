@@ -2,6 +2,10 @@
 #include <assert.h>
 
 
+#ifndef DEBUG
+#   define DEBUG 0
+#endif
+
 /*
  * Flying Squid
  * ------------------
@@ -159,9 +163,10 @@ int RabinServer::write_block_to_client(unsigned i) {
     if (n < 0)
         return n;
 
-    string forlog = descriptor.old ? " Did not write data.":"";
+    if(DEBUG != 0) {
+        string forlog = descriptor.old ? " Did not write data.":"";
         cerr << "Writing block "<< i <<" to the client. Size "<<block_i->data_size << "." <<forlog<<endl;
-
+    }
     if(!descriptor.old) {
 
         char *data = (char *) block_i -> data;

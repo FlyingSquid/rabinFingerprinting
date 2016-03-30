@@ -45,7 +45,8 @@ int main (int argc, char* argv[]) {
         
         cout<<"Sending"<< s <<endl;;
         int a = r->send_file((char *)c, n);
-        cout <<  a << " blocks sent.\n" << endl;
+        cerr <<  a << " blocks sent.\n" << endl;
+
         fclose(t);
         t = NULL;
     }
@@ -67,7 +68,8 @@ int main (int argc, char* argv[]) {
             /**************************************************/
             printf("Sending %s\n",argv[i]);
             int a = r->send_file((char *)c, n);
-            cout <<  a << " blocks sent.\n" << endl;
+            
+            cerr <<  a << " blocks sent.\n" << endl;
             fclose(t);
             /*************************************************/
         }

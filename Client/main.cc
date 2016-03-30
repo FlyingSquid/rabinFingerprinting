@@ -25,6 +25,7 @@ int main (int argc, char *argv[]) {
             fflush(f);
 
             cerr << "Received " << a <<" blocks.\n\n"<<endl;
+            
             string s = "xdg-open " + s1;
             system(s.c_str());
             cin >> go;

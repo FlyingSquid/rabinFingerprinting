@@ -226,7 +226,10 @@ unsigned RabinServer::insert_block(char *b, int size) {
     try {
         block *cur = blocks.at(n);
         if(cur->data_size != (unsigned)size || memcmp(cur->data, b, size)) {
-            cerr<<"Overwriting current block"<<endl;
+            if(DEBUG != 0) {
+               cerr<<"Overwriting current block"<<endl;
+               
+            }
             blocks[n] = new_block;
             delete cur;
         } else {

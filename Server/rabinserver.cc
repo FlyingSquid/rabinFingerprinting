@@ -44,7 +44,9 @@ RabinServer::RabinServer(int port_) {
 
 int RabinServer::connect_to_client() {
 
-    cerr << "Listening at port no "<< portno <<endl;
+    if(DEBUG != 0) {
+        cerr << "Listening at port no "<< portno <<endl;
+    }
 
     listen(sockfd, 5);
     clilen = sizeof(cli_addr);
@@ -82,7 +84,9 @@ int RabinServer::send_file(char *file, size_t s) {
     int num_blocks = 0;
     unsigned block_num;
 
-    cerr << "Size of file is " << s << endl;
+    if(DEBUG != 0)
+        cerr << "Size of file is " << s << endl;
+
     for(i = 2; i < s; i++) {
        
         /* Establishes a max size of a block*/

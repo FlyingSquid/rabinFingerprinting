@@ -1,3 +1,9 @@
+/* Normal ugly inefficient proxy
+ * 
+ * http://godlytalias.blogspot.com/2013/02/simple-proxy-server-using-c.html
+*/
+
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
@@ -8,18 +14,11 @@
 #include<netinet/in.h>
 #include<netdb.h>
 #include<errno.h>
-#include "../Server/rabinserver.h"
-
-/*
- * Dinky ugly server-side testing integration proxy that uses rabinserver.
- * Based on a (admittedly bad) proxy at 
-    http://godlytalias.blogspot.com/2013/02/simple-proxy-server-using-c.html
-*/
 
 
-void error(string msg)
+void error(char *msg)
 {
-	perror(msg.c_str());
+	perror(msg);
 	exit(0);
 }
   
@@ -31,8 +30,9 @@ int main(int argc,char* argv[])
 	struct hostent* host;
 	int sockfd,newsockfd;
 	   
-	if(argc<3)
-		error("./lproxy <port_no> <rabin port_no>");
+	if(argc<2)
+		error("./lproxy <port_no>");
+	  
 	   
 	bzero((char*)&serv_addr,sizeof(serv_addr));
 	bzero((char*)&cli_addr, sizeof(cli_addr));
@@ -49,32 +49,27 @@ int main(int argc,char* argv[])
 	if(bind(sockfd,(struct sockaddr*)&serv_addr,sizeof(serv_addr))<0)
 		error("Error on binding");
 	  
+	  
 	listen(sockfd,50);
 	socklen_t clilen=sizeof(cli_addr);	 
 	 
-
-    cerr << "Trying to connect" <<endl;	  
-    RabinServer rabin_s(atoi(argv[2]));
-	/* TODO: I guess THIS is blocking. This may be a POSSIBLE BUG. */
-    rabin_s.connect_to_client();
-    /*****************************************/
-    cerr << "Connection to intproxy established" <<endl; 
-    
 	accepting:
-	newsockfd=accept(sockfd,(struct sockaddr*)&cli_addr,&clilen);
+
+
+    /*****************************************/
+    newsockfd=accept(sockfd,(struct sockaddr*)&cli_addr,&clilen);
 	   
 	if(newsockfd<0)
 		error("Problem in accepting connection");
 	
 
-    /* Lets make this connection persistant.  */
-
-
- 	pid=fork();
+  
+	pid=fork();
 	/* This is ugly, it creates a new process for every connection + uses gotos to do this
 	* kinda crappy programming, should iterate and use 'select' but whatever.*/
 	if(pid==0)
 	{
+        printf("New connection\n");
 
 		struct sockaddr_in host_addr;
 		int flag=0,newsockfd1,n,port=0,i,sockfd1;
@@ -159,46 +154,20 @@ int main(int argc,char* argv[])
 		    error("Error writing to socket");
 		else{
 			
-            string tmplte="XXXXXX";
-            char *fname = NULL;
-            /* figure out how to use mkstemp */
-            //fname  = mktemp((char *)tmplte.c_str());
-            if(fname == NULL) {
-                fname = new char[20];
-                strcpy(fname, "temporary2.file");
-            }
-            FILE* tmp = fopen(fname, "w+");
-            
-            int s = 0; /* Holds total size of the file*/
-			
-            do {
+			do {
 				bzero((char*)buffer,500);
 				n=recv(sockfd1,buffer,500,0);
 				
 				if(!(n<=0)) {
-					fwrite(buffer, n, 1, tmp);
-                    s = s + n;
+					send(newsockfd,buffer,n,0);
 				}
-
 			} while(n>0);
-
-            fflush(tmp);
-            fseek(tmp, 0L, SEEK_SET);
-            char c[s];
-
-            fread(c, s, 1, tmp);
-            rabin_s.send_file((char *) c, s);
-
-            fclose(tmp);
-            remove((const char *) fname);
 		}
 	}
 	else
 	{
-        string s = "400 : BAD REQUEST\nONLY HTTP REQUESTS ALLOWED";
-	    rabin_s.send_file((char *)s.c_str(),s.length());
+	    send(newsockfd,"400 : BAD REQUEST\nONLY HTTP REQUESTS ALLOWED",18,0);
 	}
-    rabin_s.~RabinServer();
 	close(sockfd1);
 	close(newsockfd);
 	close(sockfd);

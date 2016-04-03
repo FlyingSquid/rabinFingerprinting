@@ -1,4 +1,4 @@
-all: client server
+all: client server proxy
 
 client:
 	g++ -std=c++0x -g -Wall lproxy.cc ../Client/rabinclient.h ../Client/rabinclient.cc -o intproxy
@@ -6,3 +6,5 @@ client:
 server:
 	g++ -std=c++0x -g -Wall sproxy.cc ../Server/rabinserver.h ../Server/rabinserver.cc -o servproxy
 
+proxy:
+	gcc -g -Wall normalproxy.c -o proxy

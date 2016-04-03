@@ -15,9 +15,9 @@ http://godlytalias.blogspot.com/2013/02/simple-proxy-server-using-c.html
 */
 
 
-void error(char* msg)
+void error(string msg)
 {
-	perror(msg);
+	perror(msg.c_str());
 	exit(0);
 }
   
@@ -25,6 +25,9 @@ int main(int argc,char* argv[])
 {
 	pid_t pid;
 	struct sockaddr_in addr_in,cli_addr,serv_addr;
+
+    
+
 	struct hostent* host;
 	int sockfd,newsockfd;
 	   
@@ -49,7 +52,7 @@ int main(int argc,char* argv[])
 	  
 	  
 	listen(sockfd,50);
-	int clilen=sizeof(cli_addr);	 
+	socklen_t clilen=sizeof(cli_addr);	 
 	 
 	accepting:
 	 
@@ -57,23 +60,20 @@ int main(int argc,char* argv[])
 	   
 	if(newsockfd<0)
 		error("Problem in accepting connection");
-	  
+	
+
+    /* Lets make this connection persistant.  */
+
+    int rport = atoi(argv[3]);
+    RabinClient rabin_c(argv[2], rport);
+    rabin_c.connect_to_server();
+    /*****************************************/
+  
 	pid=fork();
 	/* This is ugly, it creates a new process for every connection + uses gotos to do this
 	* kinda crappy programming, should iterate and use 'select' but whatever.*/
 	if(pid==0)
 	{
-
-        /*
-         * Creating an instance of RabinClient
-         *
-         */ 
-
-        int rport = atoi(argv[3]);
-
-        RabinClient rabin_c(argv[2], rport);
-        rabin_c -> connect_to_server();
-        /**************************************/
 
 		struct sockaddr_in host_addr;
 		int flag=0,newsockfd1,n,port=0,i,sockfd1;
@@ -93,7 +93,7 @@ int main(int argc,char* argv[])
 		   
 		flag=0;
 		   
-		for(i=7;i<strlen(t2);i++)
+		for(i=7;(unsigned)i<strlen(t2);i++)
 		{
 		if(t2[i]==':')
 		{
@@ -160,20 +160,29 @@ int main(int argc,char* argv[])
 			
             // In theory, this should work. This requires rabinserver
             // on the other side though along with a proxy that uses it
-            char *fname = tmpnam(NULL);
+            string tmplte="XXXXXX";
+            char *fname = NULL;
+            /* figure out how to use mkstemp */
+            //fname  = mktemp((char *)tmplte.c_str());
+            if(fname == NULL) {
+                fname = new char[20];
+                strcpy(fname, "temporary.file");
+            }
             FILE* tmp = fopen(fname, "w+");
-            rabin_c->receive_file(tmp);
+            rabin_c.receive_file(tmp);
             
             fseek(tmp, 0L, SEEK_END);
             int n = ftell(tmp);
-            fseek(t, 0L, SEEK_SET);
+            fseek(tmp, 0L, SEEK_SET);
 
             char c[n];
             bzero((char *)c, n);
             fread(c, n, 1, tmp);
             
             send(newsockfd, c, n, 0);
-
+            fclose(tmp);
+            remove((const char *) fname);
+            
         /*
 			do {
 				bzero((char*)buffer,500);
@@ -199,5 +208,8 @@ int main(int argc,char* argv[])
 	close(newsockfd);
 	goto accepting;
 	}
+
+    (void) addr_in;
+
 	return 0;
 }

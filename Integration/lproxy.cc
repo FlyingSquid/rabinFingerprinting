@@ -1,3 +1,11 @@
+/* Dinky ugly client-side integration proxy that uses rabinclient.
+ * 
+ * Based on a (admittedly bad) proxy at 
+ *
+ * http://godlytalias.blogspot.com/2013/02/simple-proxy-server-using-c.html
+*/
+
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
@@ -10,12 +18,6 @@
 #include<errno.h>
 #include "../Client/rabinclient.h"
 
-/*
- * Dinky ugly client-side integration proxy that uses rabinclient.
- * Based on a (admittedly bad) proxy at 
-    http://godlytalias.blogspot.com/2013/02/simple-proxy-server-using-c.html
-*/
-
 
 void error(string msg)
 {
@@ -27,8 +29,6 @@ int main(int argc,char* argv[])
 {
 	pid_t pid;
 	struct sockaddr_in addr_in,cli_addr,serv_addr;
-
-    
 
 	struct hostent* host;
 	int sockfd,newsockfd;

@@ -1,3 +1,5 @@
+all: client server
+
 client:
 	g++ -std=c++0x -g -Wall lproxy.cc ../Client/rabinclient.h ../Client/rabinclient.cc -o intproxy
 

@@ -1,6 +1,6 @@
 #Integration
 
-This directory holds an example of integrating Rabin Fingerprinting with proxies.
+This directory holds an example of integrating Rabin Fingerprinting with proxies. These proxies deal only with HTTP GET requests.
 
 ## Compilation 
 

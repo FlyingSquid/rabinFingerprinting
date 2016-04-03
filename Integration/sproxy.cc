@@ -8,10 +8,10 @@
 #include<netinet/in.h>
 #include<netdb.h>
 #include<errno.h>
-#include "../Client/rabinclient.h"
+#include "../Server/rabinserver.h"
 
 /*
- * Dinky ugly client-side integration proxy that uses rabinclient.
+ * Dinky ugly server-side testing integration proxy that uses rabinserver.
  * Based on a (admittedly bad) proxy at 
     http://godlytalias.blogspot.com/2013/02/simple-proxy-server-using-c.html
 */
@@ -33,8 +33,8 @@ int main(int argc,char* argv[])
 	struct hostent* host;
 	int sockfd,newsockfd;
 	   
-	if(argc<4)
-		error("./lproxy <port_no> <rabinserver_hostname> <rabinserver_port>");
+	if(argc<2)
+		error("./lproxy <port_no>");
 	  
 	   
 	bzero((char*)&serv_addr,sizeof(serv_addr));
@@ -66,9 +66,10 @@ int main(int argc,char* argv[])
 
     /* Lets make this connection persistant.  */
 
-    int rport = atoi(argv[3]);
-    RabinClient rabin_c(argv[2], rport);
-    rabin_c.connect_to_server();
+    RabinServer rabin_s(atoi(argv[1]));
+
+    /* TODO: I guess THIS is blocking. This may be a POSSIBLE BUG. */
+    rabin_s.connect_to_client();
     /*****************************************/
   
 	pid=fork();
@@ -160,40 +161,39 @@ int main(int argc,char* argv[])
 		    error("Error writing to socket");
 		else{
 			
-            // In theory, this should work. This requires rabinserver
-            // on the other side though along with a proxy that uses it
             string tmplte="XXXXXX";
             char *fname = NULL;
             /* figure out how to use mkstemp */
             //fname  = mktemp((char *)tmplte.c_str());
             if(fname == NULL) {
                 fname = new char[20];
-                strcpy(fname, "temporary.file");
+                strcpy(fname, "temporary2.file");
             }
             FILE* tmp = fopen(fname, "w+");
-            rabin_c.receive_file(tmp);
             
-            fseek(tmp, 0L, SEEK_END);
-            int n = ftell(tmp);
-            fseek(tmp, 0L, SEEK_SET);
-            fflush(tmp);
-            char c[n];
-            bzero((char *)c, n);
-            fread(c, n, 1, tmp);
-            
-            send(newsockfd, c, n, 0);
-            fclose(tmp);
-            remove((const char *) fname);
-            
-        /*
-			do {
+            int s = 0; /* Holds total size of the file*/
+			
+            do {
 				bzero((char*)buffer,500);
 				n=recv(sockfd1,buffer,500,0);
 				
 				if(!(n<=0)) {
-					send(newsockfd,buffer,n,0);
+					//send(newsockfd,buffer,n,0);
+					fwrite(buffer, n, 1, tmp);
+                    s = s + n;
 				}
-			} while(n>0); */
+
+			} while(n>0);
+
+            fflush(tmp);
+            fseek(tmp, 0L, SEEK_SET);
+            char c[s];
+
+            fread(c, s, 1, tmp);
+            rabin_s.send_file((char *) c, s);
+
+            fclose(tmp);
+            remove((const char *) fname);
 		}
 	}
 	else

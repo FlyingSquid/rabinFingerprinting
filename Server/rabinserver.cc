@@ -61,6 +61,11 @@ int RabinServer::connect_to_client() {
 
 }
 
+int RabinServer::disconnect_from_server() {
+
+    return close(newsockfd);
+}
+
 RabinServer::~RabinServer () {
 
     close(newsockfd);

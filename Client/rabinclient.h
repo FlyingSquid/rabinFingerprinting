@@ -68,12 +68,14 @@ class RabinClient
         /* Establishes a connection to the server */
         int connect_to_server();
 
-        unsigned insert_block (char *b, unsigned size, unsigned bno);
-        
-        block *get_block(unsigned b);
+        int disconnect_from_server();
+
 
     private:
+ 
+        unsigned insert_block (char *b, unsigned size, unsigned bno);
         
+        block *get_block(unsigned b);       
         /* Hash function to insert blocks to <blocks> */ 
         unsigned int hash_function(char *b, int size);
        

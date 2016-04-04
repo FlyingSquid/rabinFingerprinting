@@ -150,6 +150,12 @@ int RabinClient::connect_to_server() {
 
 }
 
+int RabinClient::disconnect_from_server() {
+
+    return close(sockfd);
+
+}
+
 /* This should probably eventually be a prvate function */
 unsigned RabinClient::insert_block (char *b, unsigned size, unsigned bno) {
         

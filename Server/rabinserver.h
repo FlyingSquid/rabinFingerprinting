@@ -55,11 +55,6 @@ class RabinServer
         int send_file(char *file, size_t s); 
 
 
-        /* Exists only for non-network testing. Adds file blocks
-         * to the hash table */  
-        int add_blocks(char *file, size_t s); 
-
-
         /* Writes a given block to the user */
         int write_block_to_client(unsigned i);
 
@@ -68,14 +63,19 @@ class RabinServer
         * called  */
         int connect_to_client();
 
+        int disconnect_from_server();
 
-        /* Inserts a block into the local cache */
-        unsigned insert_block (char *b, int size);
-        
-        char *get_block(unsigned b);
+
+        /* Exists only for non-network testing. Adds file blocks
+         * to the hash table */  
+        int add_blocks(char *file, size_t s); 
+
 
     private:
         
+        unsigned insert_block (char *b, int size);
+        
+        char *get_block(unsigned b);
         /* Hash function to insert blocks to <blocks> */ 
         unsigned int hash_function(char *b, int size);
         /* Rabin function */

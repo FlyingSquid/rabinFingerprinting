@@ -84,8 +84,12 @@ int main(int argc,char* argv[])
           server_->h_length);
    serv_addr_.sin_port = htons(portno);
 
-connect:
+	int rport = atoi(argv[4]);
+    RabinClient rabin_c(argv[2], rport);
 
+  while(1) {
+
+   
    if(connect(sockfd_, (struct sockaddr *) &serv_addr_, sizeof(serv_addr_)) < 0)
             error("Error connecting to proxy");
    else
@@ -93,13 +97,11 @@ connect:
     /************************************************************************/
  
     /*Connected to rabin client */
-	int rport = atoi(argv[4]);
-    RabinClient rabin_c(argv[2], rport);
     rabin_c.connect_to_server();
 	cerr << "Connected to rabinserver" <<endl;
     /*****************************************/
 
-    while(1) {
+
         cerr << "Waiting to accept" <<endl;
  
         newsockfd=accept(sockfd,(struct sockaddr*)&cli_addr,&clilen);
@@ -111,7 +113,6 @@ connect:
 	    }
         cerr<<"Accepted "<< newsockfd<<endl;
 
-    alive:
         /* Just want to forward the request */
         char buffer[1000];
 		bzero((char*)buffer,1000);
@@ -119,29 +120,30 @@ connect:
 
 		if (read(newsockfd,buffer,1000) < 0) {
             cerr <<"READ failed"<<endl;
-            close(newsockfd);
+            close(sockfd_);
             continue;
         }
         cerr << "Read header "<<endl;
 
         if(strlen(buffer) < 0) {
             send(newsockfd, "ERROR:400\n",10 , MSG_NOSIGNAL);
-            goto alive;
         }
 
 
-        char *alive = strstr(buffer, "Connection: keep-alive");
         /* Have received the request here */
         int n = write(sockfd_, buffer, strlen(buffer));
         if(n < 0) {
 	        close(newsockfd);
             close(sockfd_);
+            rabin_c.disconnect_from_server();
             cerr << errno <<endl;
             cerr << "Could not write to proxy"  <<endl;
-            exit(0);    //This should go
-            goto connect;
-        }
-        cerr << "Written to proxy" <<endl;
+         
+            continue; 
+        } if (n == 0) {
+            continue;
+        } 
+        cerr << "Written to proxy "<<n<<"bytes buff has length"<<strlen(buffer) <<endl;
         string tmplte="XXXXXX";
         char *fname = NULL;
         //fname  = mktemp((char *)tmplte.c_str());
@@ -151,6 +153,7 @@ connect:
         }
 
         FILE* tmp = fopen(fname, "w+");
+        cerr<<"Receiving file"<<endl;
         rabin_c.receive_file(tmp);
         cerr << "Received file" <<endl;
             
@@ -166,23 +169,18 @@ connect:
         cerr<<"READY TO SEND"<<endl;
         if(send(newsockfd, c, n, MSG_NOSIGNAL) < 0) {
             cerr <<"Send ERROR, possibly hit browser timeout"<<endl;
+            close(sockfd_);
+            close(newsockfd);
             continue;
         }
 
 
          fclose(tmp);
          remove((const char *) fname);
-         cerr << "Served request" <<endl;
+         cerr << "Served request." <<endl;
+         cerr <<"Closing browser connection\n"<<endl;
          close(sockfd_);
-         /* Figure out what to close here */
-         if(alive != NULL) {
-            cerr << "Alive" <<endl;
-            cerr <<"\n"<<endl;
-            goto alive;
-         }
-
-            cerr <<"Closing browser connection\n"<<endl;
-	        close(newsockfd);
+         close(newsockfd);
 	}
 
     (void) addr_in;

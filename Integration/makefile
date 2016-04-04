@@ -8,3 +8,12 @@ server:
 
 proxy:
 	gcc -g -Wall normalproxy.c -o proxy
+
+try2: hrd psb proxy
+
+hrd:
+	g++ -std=c++0x -g -Wall hrd.cc ../Client/rabinclient.h ../Client/rabinclient.cc -o hdrdr
+
+psb:
+	g++ -std=c++0x -g -Wall psb.cc ../Server/rabinserver.h ../Server/rabinserver.cc -o prdr
+

@@ -55,19 +55,19 @@ int main(int argc,char* argv[])
     cerr << "Trying to connect" <<endl;	  
     RabinServer rabin_s(atoi(argv[2]));
 	/* TODO: I guess THIS is blocking. This may be a POSSIBLE BUG. */
-    rabin_s.connect_to_client();
     /*****************************************/
     cerr << "Connection to intproxy established" <<endl; 
     
   while(1) {
+    rabin_s.disconnect_from_client();
+    rabin_s.connect_to_client();
     cerr<<"Ready..."<<endl;
 	newsockfd=accept(sockfd,(struct sockaddr*)&cli_addr,&clilen);
-	cerr << "Accepting connection" <<endl; 
+	cerr << "Accepted connection" <<endl; 
 
 	if(newsockfd<0)
 		error("Problem in accepting connection");
 
-    alive:
         fflush(stdout);	
 		struct sockaddr_in host_addr;
 		int flag=0,newsockfd1,n,port=0,i,sockfd1;
@@ -190,7 +190,6 @@ int main(int argc,char* argv[])
             fclose(tmp);
             remove((const char *) fname);
 		}
-        goto alive; // TODO: This is dumb
 	}
 	else
 	{
@@ -200,13 +199,11 @@ int main(int argc,char* argv[])
         string s = "400 : BAD REQUEST\nONLY HTTP REQUESTS ALLOWED";
 	    rabin_s.send_file((char *)s.c_str(),s.length());
         
-        //close(newsockfd);
 	}
 
+        close(newsockfd);
  }
 	close(newsockfd);
-    rabin_s.~RabinServer();
     (void) addr_in;
-    goto alive;
 	return 0;
 }

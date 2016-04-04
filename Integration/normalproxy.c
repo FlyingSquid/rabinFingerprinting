@@ -55,13 +55,14 @@ int main(int argc,char* argv[])
 	 
 	accepting:
 
-
+    fprintf(stderr, "Ready!\n");
     /*****************************************/
     newsockfd=accept(sockfd,(struct sockaddr*)&cli_addr,&clilen);
 	   
 	if(newsockfd<0)
 		error("Problem in accepting connection");
 	
+    printf("New connection\n");
 
   
 	pid=fork();
@@ -69,7 +70,6 @@ int main(int argc,char* argv[])
 	* kinda crappy programming, should iterate and use 'select' but whatever.*/
 	if(pid==0)
 	{
-        printf("New connection\n");
 
 		struct sockaddr_in host_addr;
 		int flag=0,newsockfd1,n,port=0,i,sockfd1;
@@ -157,7 +157,6 @@ int main(int argc,char* argv[])
 			do {
 				bzero((char*)buffer,500);
 				n=recv(sockfd1,buffer,500,0);
-				
 				if(!(n<=0)) {
 					send(newsockfd,buffer,n,0);
 				}
@@ -171,6 +170,7 @@ int main(int argc,char* argv[])
 	close(sockfd1);
 	close(newsockfd);
 	close(sockfd);
+    fprintf(stderr,"Done\n");
 	_exit(0);
 	}
 	else

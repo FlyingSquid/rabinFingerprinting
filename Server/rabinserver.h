@@ -63,7 +63,7 @@ class RabinServer
         * called  */
         int connect_to_client();
 
-        int disconnect_from_server();
+        int disconnect_from_client();
 
 
         /* Exists only for non-network testing. Adds file blocks

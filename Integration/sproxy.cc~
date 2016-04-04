@@ -80,11 +80,11 @@ int main(int argc,char* argv[])
             continue;
         }
 		   
-		sscanf(buffer,"%s %s %s",t1,t2,t3); 
-		bool c1 = ((strncmp(t1,"GET",3)==0)); 
-		bool c2 = (strncmp(t3,"HTTP/1.1",8)==0); 
-		bool c3 = (strncmp(t3,"HTTP/1.0",8)==0); 
-		bool c4 = (strncmp(t2,"http://",7)==0); 
+		sscanf(buffer,"%s %s %s",t1,t2,t3);
+		bool c1 = ((strncmp(t1,"GET",3)==0));
+		bool c2 = (strncmp(t3,"HTTP/1.1",8)==0);
+		bool c3 = (strncmp(t3,"HTTP/1.0",8)==0);
+		bool c4 = (strncmp(t2,"http://",7)==0);
 
 		/* Only deals with HTTP get, there are some further restrictions */
 		if(c1 && (c2 || c3) && c4)
@@ -195,15 +195,16 @@ int main(int argc,char* argv[])
 	else
 	{
         cerr <<"BAD FILE: Terminating connection"<<endl;
-	    cerr <<c1<<" " <<c2<<" "<< c3 << " "<< c4<<endl;
-        cerr << buffer<<endl;
+	cerr <<c1<<" " <<c2<<" "<< c3 << " ":w<< c4<<endl;
         string s = "400 : BAD REQUEST\nONLY HTTP REQUESTS ALLOWED";
 	    rabin_s.send_file((char *)s.c_str(),s.length());
         
-        //close(newsockfd);
+        close(newsockfd);
+        rabin_s.~RabinServer();
 	}
 
  }
+    //NEVER CLOSE THIS CONNECTION
 	close(newsockfd);
     rabin_s.~RabinServer();
     (void) addr_in;

@@ -122,8 +122,10 @@ int RabinServer::send_file(char *file, size_t s) {
     descriptor.block_num = htonl(0);
     descriptor.data_size = htonl(0);
     descriptor.old = false;
-
     write(newsockfd, &descriptor, sizeof(block_desc));
+    
+    if(DEBUG)
+        cerr << "Written EOF"<<endl;
     num_blocks++;
 
     return num_blocks;

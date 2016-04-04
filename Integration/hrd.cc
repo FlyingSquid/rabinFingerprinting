@@ -62,7 +62,6 @@ int main(int argc,char* argv[])
 
     int proxy_port = atoi(argv[3]);
     int rabin_port = atoi(argv[4]);
-    (void) rabin_port;
 
     struct sockaddr_in proxy_addr;
 
@@ -75,7 +74,11 @@ int main(int argc,char* argv[])
     proxy_addr.sin_port = htons(proxy_port);
 
 
-
+    /* The Rabin connection will be persistent for now,
+     * potential robustness imporvement if it can be reopened */ 
+    RabinClient rabin_c(argv[2], rabin_port);
+    rabin_c.connect_to_server();
+    
 
   while(1) {
       cerr<<"Ready"<<endl;
@@ -117,19 +120,39 @@ int main(int argc,char* argv[])
          cerr << "Write failed" << n <<endl;
         continue;
 	}
-    cerr << "Now reading"<<endl;
-    do {
+    cerr << "Now receiving"<<endl;
+
+
+/*    do {
 		bzero((char*)buffer,1000);
 		n=recv(proxy_sock_fd,buffer,1000,0);
 	    cerr << buffer <<endl;	
         if(n > 0) {
             send(newsockfd, buffer, n, MSG_NOSIGNAL);
 		}
-	} while(n>0);
+	} while(n>0);*/
 
-    
-       close(proxy_sock_fd);
-       close(newsockfd);
+
+    unsigned blocks_recvd = 0;
+    do {
+        FILE*tmp = fopen("temporary.file", "w+");
+        blocks_recvd = rabin_c.receive_file(tmp);
+        if(blocks_recvd > 1) {
+            /* read the response into a buffer c */
+            fseek(tmp, 0L, SEEK_END);
+            n = ftell(tmp);
+            fseek(tmp, 0L, SEEK_SET);
+            char c[n];
+            bzero((char *)c, n);
+            fread(c, n, 1, tmp);
+            /*************************************/
+            cerr<<"Sending"<<endl;
+            send(newsockfd, c, n, MSG_NOSIGNAL);
+        }
+    } while (blocks_recvd > 1); // 1 block will be used to denote eof
+
+    close(proxy_sock_fd);
+    close(newsockfd);
 
    }
 

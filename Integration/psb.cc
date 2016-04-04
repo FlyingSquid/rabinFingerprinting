@@ -62,7 +62,6 @@ int main(int argc,char* argv[])
 
     int proxy_port = atoi(argv[3]);
     int rabin_port = atoi(argv[4]);
-    (void) rabin_port;
 
     struct sockaddr_in proxy_addr;
 
@@ -75,7 +74,8 @@ int main(int argc,char* argv[])
     proxy_addr.sin_port = htons(proxy_port);
 
 
-
+    RabinServer rabin_s(rabin_port);
+    rabin_s.connect_to_client();
 
   while(1) {
       cerr<<"Ready"<<endl;
@@ -118,18 +118,21 @@ int main(int argc,char* argv[])
         continue;
 	}
     cerr << "Now reading"<<endl;
+
     do {
 		bzero((char*)buffer,1000);
 		n=recv(proxy_sock_fd,buffer,1000,0);
-		cerr << buffer <<endl;
+		
         if(n > 0) {
-            send(newsockfd, buffer, n, MSG_NOSIGNAL);
+            cerr<<"Sending"<<endl;
+            rabin_s.send_file(buffer, n);
 		}
 	} while(n>0);
-
     
-       close(proxy_sock_fd);
-       close(newsockfd);
+    rabin_s.send_file(buffer, 0);   /* size 0 denotes eof */
+
+    close(proxy_sock_fd);
+    close(newsockfd);
 
    }
 

@@ -4,6 +4,7 @@ int main (int argc, char *argv[]) {
 
         if(argc < 4) {
             cout << "Usage requires hostname, port no, file addr" << endl;
+            exit(1);
         }
         int port = atoi(argv[2]);
         RabinClient *r = new RabinClient(argv[1], port);

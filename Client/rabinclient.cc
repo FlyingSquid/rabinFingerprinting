@@ -22,6 +22,18 @@ RabinClient::RabinClient(char * hostname, int port_) {
 
         sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
+
+        struct timeval timeout;
+        timeout.tv_sec = 10; /* 10 second timeout */
+        timeout.tv_usec = 0;
+        if(setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout,
+                        sizeof(timeout)) < 0) {
+            error("Could not set timeout. Exiting.");
+
+        }
+
+
+
         server = gethostbyname(hostname); 
 
         if(server == NULL) {
@@ -93,7 +105,7 @@ block *RabinClient::receive_block() {
                 n = read(sockfd, bd_buf + br, sizeof(block_desc) - br);
                 
                 if(n <= 0) {
-                    error("Error: Connection may have been closed.");
+                    fprintf(stderr,"Error: Connection may have been closed or timeout");         return NULL;
                 }
 
                 br += n;
@@ -129,6 +141,9 @@ block *RabinClient::receive_block() {
 
                 /* Network may be too fast */            
                 n = read(sockfd, buf + bytesRead, s - bytesRead);
+                if(n <= 0) {
+                    fprintf(stderr,"Error: Connection may have been closed or timeout");         return NULL;
+                }
                 bytesRead += n;
             }
             /* Used to have an error when bytesRead exceeded s*/

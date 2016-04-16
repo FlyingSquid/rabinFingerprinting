@@ -152,6 +152,7 @@ namespace tcp_proxy
             } 
             
             int a = r->  receive_file(f);
+            if (a <= 1) close();
             fseek(f, 0L, SEEK_END);
             n = ftell(f);
             fseek(f, 0L, SEEK_SET);
